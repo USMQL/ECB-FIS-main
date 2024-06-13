@@ -4,30 +4,7 @@ import { auth } from '../firebase-config'
 
 export default function HomeScreen({ navigation }) {
     const user = auth.currentUser;
-
-    // Cerrar sesión del usuario.
-    const handleSignOut = () => {
-        Alert.alert('Cerrar Sesión', '¿Está seguro?', [
-            { text: 'Cancelar', style: 'cancel' },
-            { text: 'Si', onPress: () => (
-                auth.signOut().then(() => {
-                    navigation.navigate('Login');
-                }).catch((error) => {
-                    Alert.alert('Error', error.message);
-                })
-            ),}
-        ]);
-    }
-
-    // Botón de cerrar sesión en la barra de navegación.
-    navigation.setOptions({
-        headerLeft: () => (
-        <TouchableOpacity onPress={handleSignOut} style={[styles.signOutButton]}>
-            <Text style={{color: 'white', fontWeight: 'bold'}}>Cerrar Sesión</Text>
-        </TouchableOpacity>
-        ),
-    });
-    
+        
     return (
         <View style={styles.container}>
             <Text style={styles.title}>ECB-FIS</Text>
@@ -61,14 +38,5 @@ const styles = StyleSheet.create({
         marginTop: 60,
         borderRadius: 10,
         alignItems: 'center',
-    },
-    signOutButton: {
-        width: 120,
-        height: 30,
-        backgroundColor: 'red',
-        borderRadius: 20,
-        alignItems: 'center',
-        justifyContent: 'center',
-        marginLeft: 10,
     },
 });

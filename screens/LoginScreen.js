@@ -48,8 +48,6 @@ export default function Login({ navigation }) {
         const user = userCredential.user;
         // console.log(user);
         Alert.alert('Exito', 'Sesion iniciada con exito');
-
-        navigation.navigate('Home')
       })
       .catch((error) => {
         Alert.alert('Error', errorMessages[error.code] || error.message);
