@@ -1,6 +1,7 @@
 import 'react-native-gesture-handler';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 import { useEffect, useState } from 'react';
 import { auth } from './firebase-config';
@@ -14,6 +15,7 @@ import HomeScreen from './screens/HomeScreen';
 import SignOutButton from './components/SignOutButton';
 
 const Stack = createStackNavigator();
+const Tab = createBottomTabNavigator();
 
 export default function App() {
   const [loading, setLoading] = useState(true);
@@ -43,8 +45,8 @@ export default function App() {
         </Stack.Navigator>
       ) : (
         // El usuario se encuentra logeado.
-        <Stack.Navigator initialRouteName={'Home'}>
-          <Stack.Screen name="Home" component={HomeScreen} options={{
+        <Tab.Navigator initialRouteName={'Home'} screenOptions={tabNavigatorScreenOptions}>
+          <Tab.Screen name="Home" component={HomeScreen} options={{
             title: 'Inicio',
             headerTransparent: true,
             headerTitleAlign: 'center',
@@ -54,8 +56,20 @@ export default function App() {
             },
             headerLeft: () => (<SignOutButton/>),
           }}/>
-        </Stack.Navigator>
+        </Tab.Navigator>
       )}
     </NavigationContainer>
   );
+}
+
+const tabNavigatorScreenOptions = {
+  tabBarStyle: {
+    position: 'absolute',
+    height: 80,
+    paddingBottom: 10,
+  },
+  tabBarLabelStyle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
 }
