@@ -22,6 +22,12 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "156984eb-dec3-4940-ab72-05fddc8189ef"
+      }
+    },
+    "owner": "usmql"
   }
 }
