@@ -54,6 +54,9 @@ export default function Login({ navigation }) {
         const user = userCredential.user;
         // console.log(user);
         Alert.alert("Exito", "Cuenta creada con exito");
+        if (!rememberMe) {
+          AsyncStorage.clear();
+        }
       })
       .catch((error) => {
         Alert.alert("Error", errorMessages[error.code] || error.message);
