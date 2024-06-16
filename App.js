@@ -10,6 +10,7 @@ import { auth } from './firebase-config';
 import LoadingScreen from './screens/LoadingScreen';
 import LoginScreen from './screens/LoginScreen';
 import HomeScreen from './screens/HomeScreen';
+import UploadScreen from './screens/UploadScreen';
 
 // Componentes.
 import SignOutButton from './components/SignOutButton';
@@ -48,13 +49,34 @@ export default function App() {
         <Tab.Navigator initialRouteName={'Home'} screenOptions={tabNavigatorScreenOptions}>
           <Tab.Screen name="Home" component={HomeScreen} options={{
             title: 'Inicio',
-            headerTransparent: true,
+            // headerTransparent: true,
+            headerStyle: {
+              backgroundColor: '#fff',
+              elevation: 0,
+              shadowOpacity: 0,
+              borderBottomWidth: 0,
+            },
             headerTitleAlign: 'center',
             headerTintColor: '#000',
             headerTitleStyle: {
               fontWeight: 'bold',
             },
             headerLeft: () => (<SignOutButton/>),
+          }}/>
+          <Tab.Screen name="Upload" component={UploadScreen} options={{
+            title: 'Subir Ejercicio',
+            // headerTransparent: true,
+            headerStyle: {
+              backgroundColor: '#fff',
+              elevation: 0,
+              shadowOpacity: 0,
+              borderBottomWidth: 0,
+            },
+            headerTitleAlign: 'center',
+            headerTintColor: '#000',
+            headerTitleStyle: {
+              fontWeight: 'bold',
+            },
           }}/>
         </Tab.Navigator>
       )}
@@ -64,7 +86,7 @@ export default function App() {
 
 const tabNavigatorScreenOptions = {
   tabBarStyle: {
-    position: 'absolute',
+    // position: 'absolute',
     height: 80,
     paddingBottom: 10,
   },
