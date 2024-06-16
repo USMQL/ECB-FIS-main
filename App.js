@@ -49,7 +49,13 @@ export default function App() {
         <Tab.Navigator initialRouteName={'Home'} screenOptions={tabNavigatorScreenOptions}>
           <Tab.Screen name="Home" component={HomeScreen} options={{
             title: 'Inicio',
-            headerTransparent: true,
+            // headerTransparent: true,
+            headerStyle: {
+              backgroundColor: '#fff',
+              elevation: 0,
+              shadowOpacity: 0,
+              borderBottomWidth: 0,
+            },
             headerTitleAlign: 'center',
             headerTintColor: '#000',
             headerTitleStyle: {
@@ -60,9 +66,11 @@ export default function App() {
           <Tab.Screen name="Upload" component={UploadScreen} options={{
             title: 'Subir Ejercicio',
             // headerTransparent: true,
-            headerBackgroundContainerStyle: {
+            headerStyle: {
               backgroundColor: '#fff',
               elevation: 0,
+              shadowOpacity: 0,
+              borderBottomWidth: 0,
             },
             headerTitleAlign: 'center',
             headerTintColor: '#000',
