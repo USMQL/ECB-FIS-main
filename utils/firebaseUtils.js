@@ -23,13 +23,11 @@ export async function subirArchivo(archivo, carpeta) {
 export async function agregarDocumento(table, data, id) {
     try {
         if (id) {
-            const docRef = await setDoc(doc(db, table, id), data);
-            return docRef.id;
+            await setDoc(doc(db, table, id), data);
+            return id;
         }
-        else {
-            const docRef = await addDoc(collection(db, table), data);
-            return docRef.id;
-        }
+        const docRef = await addDoc(collection(db, table), data);
+        return docRef.id;
     } catch(error) {
         console.error("Error adding document: ", error);
     }

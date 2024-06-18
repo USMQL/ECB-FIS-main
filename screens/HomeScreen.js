@@ -1,9 +1,17 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, TouchableOpacity, Alert } from 'react-native';
+import { StyleSheet, BackHandler, Text, View, TouchableOpacity, Alert } from 'react-native';
+import { useEffect } from 'react';
 import { auth } from '../firebase-config'
+import { exitApp } from '../utils/backAction'
 
 export default function HomeScreen({ navigation }) {
     const user = auth.currentUser;
+
+    // Salir de la aplicación.
+    useEffect(() => {
+        const backHandler = BackHandler.addEventListener("hardwareBackPress", exitApp);
+        return () => backHandler.remove();
+    }, []);
         
     return (
         <View style={styles.container}>

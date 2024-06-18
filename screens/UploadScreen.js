@@ -26,7 +26,10 @@ export default function UploadScreen() {
         tipoEjercicio: 'Normal', // Ejercicio "Diario" o "Normal".
         tiempo: 0, // Tiempo en segundos para resolver el ejercicio.
         retroalimentacion: '', // Retroalimentación del ejercicio.
+        foro: null,
+        reportado: null,
         publicadoPor: '', // UID del usuario que publicó el ejercicio.
+        disabled: false,
     });
 
     // Seleccionar una imagen de la galería.
