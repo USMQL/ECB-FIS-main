@@ -18,12 +18,13 @@ import {
   signInWithEmailAndPassword,
 } from "firebase/auth";
 import { exitApp } from "../utils/backAction";
-import { initUser } from "../utils/initUser";
+import { initUserDB } from "../utils/initUser";
 
 const errorMessages = {
   "auth/network-request-failed": "Error de red, verifique su conexión a internet",
   "auth/email-already-in-use": "La dirección de correo electrónico ya está en uso",
   "auth/invalid-email": "La dirección de correo electrónico no es válida",
+  "auth/invalid-credential": "Credenciales no válidas",
   "auth/weak-password": "La contraseña es muy débil",
   "auth/missing-password": "Ingrese una contraseña",
 };
@@ -45,7 +46,7 @@ export default function Login({ navigation }) {
       .then((userCredential) => {
         const user = userCredential.user;
         Alert.alert("Exito", "Cuenta creada con exito");
-        initUser(user);
+        initUserDB(user);
         if (!rememberMe) {
           AsyncStorage.clear();
         }
@@ -58,9 +59,7 @@ export default function Login({ navigation }) {
   const handleLogin = async () => {
     await signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
-        const user = userCredential.user;
-        // console.log(user);
-        Alert.alert("Exito", "Sesion iniciada con exito");
+        Alert.alert("Exito", "Sesión iniciada con exito");
         if (!rememberMe) {
           AsyncStorage.clear();
         }

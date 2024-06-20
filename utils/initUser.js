@@ -1,6 +1,7 @@
-import { agregarDocumento } from './firebaseUtils';
+import { Alert } from 'react-native';
+import { actualizarDocumento, agregarDocumento, obtenerDocumento } from './firebaseUtils';
 
-export function initUser(user){
+export function initUserDB(user){
     agregarDocumento("users", {
         displayName: user.email.split('@')[0],
         bio: null,
@@ -9,8 +10,7 @@ export function initUser(user){
         isAdmin: false,
         isProfesor: false,
         isAnonymous: user.isAnonymous,
-        phoneNumber: user.phoneNumber===undefined ? null : user.phoneNumber,
-        photoURL: user.photoURL===undefined ? null : user.photoURL,
+        avatar: null,
         disabled: false,
         stats: {
           logros: [],
@@ -21,17 +21,32 @@ export function initUser(user){
           ejerciciosEnCurso: [],
           ejerciciosTerminados: [],
           ejerciciosIntentados: [],
-          puntajeTotal: 0,
+          puntajeTotal: {
+            ejerciciosDiarios: 0,
+            ejerciciosGenerados: 0,
+          }
         },
-        userVisibilitySettings: {
+        visibilitySettings: {
           showEmail: false,
-          showPhoneNumber: false,
           showBio: true,
-          showPhotoURL: true,
+          showAvatar: true,
           showLogros: true,
           showRacha: true,
           showRecompensas: true,
           showPuntajeTotal: true,
         },
       }, user.uid);
+}
+
+export async function getUserDB(user){
+  const doc = await obtenerDocumento("users", user.uid).catch((error) => {
+    Alert.alert("Ups!", "Ha ocurrido un error al intentar obtener los datos del usuario");
+  })
+  return doc.data();
+}
+
+export async function updateUserDB(user, data){
+  return await actualizarDocumento("users", data, user.uid).catch((error) => {
+    Alert.alert("Ups!", "Ha ocurrido un error al intentar actualizar los datos del usuario");
+  });
 }

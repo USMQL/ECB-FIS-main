@@ -5,6 +5,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 import { useEffect, useState } from 'react';
 import { auth } from './firebase-config';
+import { getUserDB } from './utils/initUser';
 
 // Pantallas.
 import LoadingScreen from './screens/LoadingScreen';
@@ -21,10 +22,14 @@ const Tab = createBottomTabNavigator();
 export default function App() {
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
+  const [userdb, setUserdb] = useState(null);
 
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((user) => {
+    const unsubscribe = auth.onAuthStateChanged(async (user) => {
       setUser(user);
+      if (user){
+        await setUserdb(await getUserDB(user));
+      }
       setLoading(false);
     });
     return () => unsubscribe();
@@ -63,6 +68,7 @@ export default function App() {
             },
             headerLeft: () => (<SignOutButton/>),
           }}/>
+          {userdb?.isProfesor ? (
           <Tab.Screen name="Upload" component={UploadScreen} options={{
             title: 'Subir Ejercicio',
             // headerTransparent: true,
@@ -78,6 +84,7 @@ export default function App() {
               fontWeight: 'bold',
             },
           }}/>
+          ):(null)}
         </Tab.Navigator>
       )}
     </NavigationContainer>

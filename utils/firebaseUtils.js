@@ -1,5 +1,5 @@
 import { db, storage } from '../firebase-config';
-import { addDoc, collection, doc, setDoc, updateDoc } from 'firebase/firestore';
+import { addDoc, collection, doc, setDoc, updateDoc, getDoc } from 'firebase/firestore';
 import { ref, uploadBytes } from 'firebase/storage';
 
 export async function subirArchivo(archivo, carpeta) {
@@ -29,7 +29,21 @@ export async function agregarDocumento(table, data, id) {
         const docRef = await addDoc(collection(db, table), data);
         return docRef.id;
     } catch(error) {
-        console.error("Error adding document: ", error);
+        console.error("Error al intentar agregar el documento: ", error);
     }
     return null;
+}
+
+export async function actualizarDocumento(table, data, id) {
+    return await updateDoc(doc(db, table, id), data).catch((error) => {
+        console.error("Error al actualizar el documento:", error);
+        throw error;
+    });
+}
+
+export async function obtenerDocumento(table, id) {
+    return await getDoc(doc(db, table, id)).catch((error) => {
+        console.error("Error al obtener el documento:", error);
+        throw error;
+    });
 }
