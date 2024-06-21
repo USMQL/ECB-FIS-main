@@ -17,11 +17,14 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
 } from "firebase/auth";
+import { exitApp } from "../utils/backAction";
+import { initUserDB } from "../utils/initUser";
 
 const errorMessages = {
-  "auth/email-already-in-use":
-    "La dirección de correo electrónico ya está en uso",
+  "auth/network-request-failed": "Error de red, verifique su conexión a internet",
+  "auth/email-already-in-use": "La dirección de correo electrónico ya está en uso",
   "auth/invalid-email": "La dirección de correo electrónico no es válida",
+  "auth/invalid-credential": "Credenciales no válidas",
   "auth/weak-password": "La contraseña es muy débil",
   "auth/missing-password": "Ingrese una contraseña",
 };
@@ -29,21 +32,11 @@ const errorMessages = {
 export default function Login({ navigation }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [rememberMe, setRememberMe] = useState(false);
+  const [rememberMe, setRememberMe] = useState(true);
 
   // Salir de la aplicación.
   useEffect(() => {
-    const backAction = () => {
-      Alert.alert("Salir", "¿Está seguro que desea salir de la aplicación?", [
-        { text: "Cancelar", style: "cancel", onPress: () => null },
-        { text: "Salir", onPress: () => BackHandler.exitApp() },
-      ]);
-      return true;
-    };
-    const backHandler = BackHandler.addEventListener(
-      "hardwareBackPress",
-      backAction
-    );
+    const backHandler = BackHandler.addEventListener("hardwareBackPress", exitApp);
     return () => backHandler.remove();
   }, []);
 
@@ -52,29 +45,27 @@ export default function Login({ navigation }) {
     await createUserWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
         const user = userCredential.user;
-        // console.log(user);
         Alert.alert("Exito", "Cuenta creada con exito");
+        initUserDB(user);
         if (!rememberMe) {
           AsyncStorage.clear();
         }
       })
       .catch((error) => {
-        Alert.alert("Error", errorMessages[error.code] || error.message);
+        Alert.alert("Ups!", errorMessages[error.code] || error.message);
       });
   };
   // Iniciar sesion
   const handleLogin = async () => {
     await signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
-        const user = userCredential.user;
-        // console.log(user);
-        Alert.alert("Exito", "Sesion iniciada con exito");
+        Alert.alert("Exito", "Sesión iniciada con exito");
         if (!rememberMe) {
           AsyncStorage.clear();
         }
       })
       .catch((error) => {
-        Alert.alert("Error", errorMessages[error.code] || error.message);
+        Alert.alert("Ups!", errorMessages[error.code] || error.message);
       });
   };
 
@@ -87,6 +78,7 @@ export default function Login({ navigation }) {
         onChangeText={(text) => setEmail(text)}
         style={[styles.input, { marginBottom: 20 }]}
         placeholder="email@dominio.com"
+        keyboardType="email-address"
       />
 
       <Text style={styles.label}>Contraseña</Text>
@@ -99,7 +91,7 @@ export default function Login({ navigation }) {
 
       <View style={styles.checkboxContainer}>
         <Checkbox value={rememberMe} onValueChange={setRememberMe} />
-        <Text style={styles.checkboxLabel}>Recordar sesión</Text>
+        <Text style={styles.checkboxLabel}>Mantener sesión abierta</Text>
       </View>
 
       <TouchableOpacity onPress={handleLogin} style={styles.button}>
