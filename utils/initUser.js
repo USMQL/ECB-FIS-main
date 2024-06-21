@@ -39,14 +39,40 @@ export function initUserDB(user){
 }
 
 export async function getUserDB(user){
-  const doc = await obtenerDocumento("users", user.uid).catch((error) => {
-    Alert.alert("Ups!", "Ha ocurrido un error al intentar obtener los datos del usuario");
-  })
-  return doc.data();
+  if (!user) return null;
+  let doc = null;
+
+  async function obtDoc(){
+    doc = await obtenerDocumento("users", user.uid).catch((error) => {
+      Alert.alert("Ups!", "Ha ocurrido un error al intentar obtener los datos del usuario", [
+        {text: "Reintentar", style: 'default', onPress: obtDoc()}
+      ]);
+    });
+  }
+  await obtDoc();
+  return doc?.data()? (doc.data()) : (null);
 }
 
 export async function updateUserDB(user, data){
   return await actualizarDocumento("users", data, user.uid).catch((error) => {
     Alert.alert("Ups!", "Ha ocurrido un error al intentar actualizar los datos del usuario");
   });
+}
+
+const subscribers = [];
+export async function refreshUserDB(user){
+  const userData = await getUserDB(user);
+  subscribers.forEach(callback => callback(userData));
+  return;
+}
+
+export function subscribeUserDB(callback){
+  if (!subscribers.includes(callback)) subscribers.push(callback);
+  return () => {
+    const index = subscribers.indexOf(callback);
+    if (index > -1) {
+      subscribers.splice(index, 1);
+    }
+    return true;
+  };
 }

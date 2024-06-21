@@ -78,6 +78,7 @@ export default function Login({ navigation }) {
         onChangeText={(text) => setEmail(text)}
         style={[styles.input, { marginBottom: 20 }]}
         placeholder="email@dominio.com"
+        keyboardType="email-address"
       />
 
       <Text style={styles.label}>Contraseña</Text>

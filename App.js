@@ -5,7 +5,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 import { useEffect, useState } from 'react';
 import { auth } from './firebase-config';
-import { getUserDB } from './utils/initUser';
+import { refreshUserDB, subscribeUserDB } from './utils/initUser';
 
 // Pantallas.
 import LoadingScreen from './screens/LoadingScreen';
@@ -23,16 +23,26 @@ export default function App() {
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
   const [userdb, setUserdb] = useState(null);
+  let unsubscribeUserDB = null;
+
+  const handleRefreshUserDBApp = async (data) => {
+    await setUserdb(data);
+  }
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (user) => {
       setUser(user);
       if (user){
-        await setUserdb(await getUserDB(user));
+        await unsubscribeUserDB;
+        unsubscribeUserDB = await subscribeUserDB(handleRefreshUserDBApp);
+        await refreshUserDB(user);
       }
       setLoading(false);
     });
-    return () => unsubscribe();
+    return () => {
+      unsubscribeUserDB();
+      unsubscribe();
+    };
   }, []);
 
   if (loading) {
@@ -41,7 +51,7 @@ export default function App() {
   
   return (
     <NavigationContainer>
-      {!user ? (
+      {!user? (
         // El usuario no se encuentra logeado.
         <Stack.Navigator initialRouteName={'Login'}>
           <Stack.Screen name="Login" component={LoginScreen} options={{

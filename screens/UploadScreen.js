@@ -91,6 +91,7 @@ export default function UploadScreen() {
                 placeholder="de que trata el ejercicio"
                 value={formData.descripcion}
                 onChangeText={text => handleInputChange('descripcion', text)}
+                multiline={true}
             />
             <Text style={styles.label}>Materia</Text>
             <TextInput
@@ -216,7 +217,7 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
     },
     input: {
-        height: 40,
+        height: 80,
         width: '100%',
         padding: 10,
         marginTop: 5,
@@ -224,6 +225,8 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: '#E0E0E0',
         borderRadius: 10,
+        textAlignVertical: 'top',
+        textAlign: 'left',
     },
     pickerContainer: {
         height: 40,
