@@ -23,7 +23,14 @@
     "react-native-screens": "3.31.1",
     "expo-image-picker": "~15.0.5",
     "@react-native-picker/picker": "2.7.5",
-    "expo-checkbox": "~3.0.0"
+    "expo-checkbox": "~3.0.0",
+    "expo-camera": "~15.0.11",
+    "expo-contacts": "~13.0.4",
+    "expo-sensors": "~13.0.8",
+    "react-dom": "18.2.0",
+    "react-native-web": "~0.19.10",
+    "@expo/metro-runtime": "~3.2.1",
+    "react-native-webview": "13.8.6"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0"
