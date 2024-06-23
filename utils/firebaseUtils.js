@@ -1,5 +1,5 @@
 import { db, storage } from '../firebase-config';
-import { addDoc, collection, doc, setDoc, updateDoc, getDoc } from 'firebase/firestore';
+import { addDoc, collection, doc, setDoc, updateDoc, getDoc, getDocs } from 'firebase/firestore';
 import { ref, uploadBytes } from 'firebase/storage';
 
 export async function subirArchivo(archivo, carpeta) {
@@ -44,6 +44,13 @@ export async function actualizarDocumento(table, data, id) {
 export async function obtenerDocumento(table, id) {
     return await getDoc(doc(db, table, id)).catch((error) => {
         console.error("Error al obtener el documento:", error);
+        throw error;
+    });
+}
+
+export async function obtenerColeccion(table) {
+    return await getDocs(collection(db, table)).catch((error) => {
+        console.error("Error al obtener la colección:", error);
         throw error;
     });
 }

@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { auth } from '../firebase-config'
 import { subscribeUserDB, refreshUserDB } from '../utils/initUser';
 import { exitApp } from '../utils/backAction'
+import { seleccionarEjercicioAleatorio } from '../utils/obtenerEjercicio';
 
 export default function HomeScreen({ navigation }) {
     const user = auth.currentUser;
@@ -11,11 +12,12 @@ export default function HomeScreen({ navigation }) {
     const [refreshing, setRefreshing] = useState(false);
     let unsubscribeUserDB = null;
 
+    // Cuando se ejecuta refreshUserDB, subscribeUserDB ejecuta la siguiente función.
     const handleRefreshUserDBHome = async (data) => {
         await setUserDB(data);
-      }
-
+    }
     useEffect(() => {
+        // Suscribirse a los cambios en la variable userDB del usuario.
         const upUserDB = async () => {
             unsubscribeUserDB = await subscribeUserDB(handleRefreshUserDBHome);
             await refreshUserDB(user);
@@ -23,19 +25,23 @@ export default function HomeScreen({ navigation }) {
         upUserDB();
         return () => unsubscribeUserDB();
     }, [user]);
-
-    // Salir de la aplicación.
-    useEffect(() => {
-        const backHandler = BackHandler.addEventListener("hardwareBackPress", exitApp);
-        return () => backHandler.remove();
-    }, []);
-
+    
     // Actualizar datos del usuario.
     const onRefresh = useCallback(() => {
         setRefreshing(true);
         refreshUserDB(user).then(() => setRefreshing(false));
     }, []);
-        
+
+    const handleSeleccionarEjercicioAleatorio = () => {
+        seleccionarEjercicioAleatorio(userDB);
+    }
+    
+    // Salir de la aplicación.
+    useEffect(() => {
+        const backHandler = BackHandler.addEventListener("hardwareBackPress", exitApp);
+        return () => backHandler.remove();
+    }, []);
+    
     return (
         <View style={styles.container}>
             <ScrollView contentContainerStyle={styles.container} refreshControl={
@@ -44,7 +50,7 @@ export default function HomeScreen({ navigation }) {
                 <Text style={styles.title}>ECB-FIS</Text>
                 <Text style={{margin: 20}}>Bienvenido <Text style={{fontWeight: 'bold'}}>{user.email.split('@')[0]}</Text>!</Text>
                 
-                <TouchableOpacity onPress={() => (alert(userDB.displayName))} style={[styles.button, {}]}>
+                <TouchableOpacity onPress={handleSeleccionarEjercicioAleatorio} style={[styles.button, {}]}>
                     <Text style={{color: 'white', fontWeight: 'bold'}}>Generar Ejercicio</Text>
                 </TouchableOpacity>
             </ScrollView>
