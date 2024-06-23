@@ -12,6 +12,7 @@ import LoadingScreen from './screens/LoadingScreen';
 import LoginScreen from './screens/LoginScreen';
 import HomeScreen from './screens/HomeScreen';
 import UploadScreen from './screens/UploadScreen';
+import StatsScreen from './screens/StatsScreen';
 
 // Componentes.
 import SignOutButton from './components/SignOutButton';
@@ -64,6 +65,22 @@ export default function App() {
         <Tab.Navigator initialRouteName={'Home'} screenOptions={tabNavigatorScreenOptions}>
           <Tab.Screen name="Home" component={HomeScreen} options={{
             title: 'Inicio',
+            // headerTransparent: true,
+            headerStyle: {
+              backgroundColor: '#fff',
+              elevation: 0,
+              shadowOpacity: 0,
+              borderBottomWidth: 0,
+            },
+            headerTitleAlign: 'center',
+            headerTintColor: '#000',
+            headerTitleStyle: {
+              fontWeight: 'bold',
+            },
+            headerLeft: () => (<SignOutButton/>),
+          }}/>
+          <Tab.Screen name="Stats" component={StatsScreen} options={{
+            title: 'Estadisticas',
             // headerTransparent: true,
             headerStyle: {
               backgroundColor: '#fff',

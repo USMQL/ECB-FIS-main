@@ -47,3 +47,10 @@ export async function obtenerDocumento(table, id) {
         throw error;
     });
 }
+
+export async function obtenerColeccion(table) {
+    return await getDocs(collection(db, table)).catch((error) => {
+        console.error("Error al obtener la colección:", error);
+        throw error;
+    });
+}
