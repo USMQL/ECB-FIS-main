@@ -12,6 +12,7 @@ import LoadingScreen from './screens/LoadingScreen';
 import LoginScreen from './screens/LoginScreen';
 import HomeScreen from './screens/HomeScreen';
 import UploadScreen from './screens/UploadScreen';
+import ProfileScreen from './screens/ProfileScreen';
 
 // Componentes.
 import SignOutButton from './components/SignOutButton';
@@ -59,6 +60,7 @@ export default function App() {
             headerTransparent: true,
           }}/>
         </Stack.Navigator>
+        
       ) : (
         // El usuario se encuentra logeado.
         <Tab.Navigator initialRouteName={'Home'} screenOptions={tabNavigatorScreenOptions}>
@@ -78,6 +80,7 @@ export default function App() {
             },
             headerLeft: () => (<SignOutButton/>),
           }}/>
+           <Tab.Screen name="Perfil" component={ProfileScreen} />
           {userdb?.isProfesor ? (
           <Tab.Screen name="Upload" component={UploadScreen} options={{
             title: 'Subir Ejercicio',
