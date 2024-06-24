@@ -93,7 +93,7 @@ export default function Login({ navigation }) {
         ¿Olvidaste tu contraseña?{" "}
         <Text
           style={styles.messageBlack}
-          onPress={() => navigation.navigate("RecuperarContraseña")}
+          onPress={() => navigation.navigate("RecuperarContrasena")}
         >
           Recuperar contraseña
         </Text>

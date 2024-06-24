@@ -15,7 +15,7 @@ import UploadScreen from './screens/UploadScreen';
 
 // Componentes.
 import SignOutButton from './components/SignOutButton';
-import RecoveryPasswordScreen from './screens/RecPasswordScreen';
+import RecPasswordScreen from './screens/RecPasswordScreen';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -59,7 +59,7 @@ export default function App() {
             title: '',
             headerTransparent: true,
           }}/>
-          <Stack.Screen name="RecuperarContrasena" component={RecoveryPasswordScreen} options={{
+          <Stack.Screen name="RecuperarContrasena" component={RecPasswordScreen} options={{
             title: '',
             headerTransparent: true,
             headerBackTitle: "volver",
