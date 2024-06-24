@@ -6,11 +6,10 @@ import {
     TextInput,
     TouchableOpacity,
     Alert,
-    BackHandler,
 } from "react-native";
-import { useEffect, useState } from "react";
-import { getAuth, sendPasswordResetEmail } from "firebase/auth";
-import { exitApp } from "../utils/backAction";
+import { useState } from "react";
+import { sendPasswordResetEmail } from "firebase/auth";
+import { auth } from "../firebase-config";
 
 const errorMessages = {
     "auth/network-request-failed":
@@ -20,16 +19,6 @@ const errorMessages = {
 
 export default function RecoveryPasswordScreen({ navigation }) {
     const [email, setEmail] = useState("");
-    const auth = getAuth();
-
-    // Salir de la aplicación.
-    useEffect(() => {
-        const backHandler = BackHandler.addEventListener(
-            "hardwareBackPress",
-            exitApp
-        );
-        return () => backHandler.remove();
-    }, []);
 
     // Recuperar contraseña
     const handleButton = async () => {
@@ -40,6 +29,7 @@ export default function RecoveryPasswordScreen({ navigation }) {
         await sendPasswordResetEmail(auth, email)
             .then(() => {
                 Alert.alert("Exito", "Correo de recuperación enviado");
+                navigation.navigate("Login");
             })
             .catch((error) => {
                 Alert.alert("Ups!", errorMessages[error.code] || error.message);
