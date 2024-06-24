@@ -3,10 +3,12 @@ import { StyleSheet, Text, View, TextInput, Button, Alert, TouchableOpacity } fr
 import { subscribeUserDB, refreshUserDB, updateUserDB } from '../utils/initUser';
 import { useEffect, useState } from 'react';
 import { actualizarDocumento , agregarDocumento, obtenerDocumento } from '../utils/firebaseUtils';
+import LoadingScreen from './LoadingScreen';
 
 
 export default function ProfileScreen({ navigation }) {
-    const [loading, setLoading] = useState(false);
+    const [loadingScreen, setLoadingScreen] = useState(true);
+    const [loadingSubmit, setLoadingSubmit] = useState(false);
     const user = auth.currentUser;
     const [userDB, setUserDB] = useState(null);
 
@@ -27,6 +29,7 @@ export default function ProfileScreen({ navigation }) {
 
     const handleRefreshUserDBPerfil = async (data) => {
         await setUserDB(data);
+        setLoadingScreen(false);
       }
 
     useEffect(() => {
@@ -41,7 +44,7 @@ export default function ProfileScreen({ navigation }) {
     // Enviar los datos a la base de datos.
     const handleSubmit = async () => {
         try{
-            setLoading(true);
+            setLoadingSubmit(true);
             
             const userData = {
                 
@@ -55,9 +58,9 @@ export default function ProfileScreen({ navigation }) {
             console.error('Error añadiendo el ejercicio: ', error);
             Alert.alert('Ups!', 'Error añadiendo el ejercicio: ', error.message);
         }
-        setLoading(false);
+        setLoadingSubmit(false);
     };
-        
+    if (loadingScreen) return <LoadingScreen/>;
     return (
 
         
@@ -80,8 +83,8 @@ export default function ProfileScreen({ navigation }) {
                 value={variable.bio}
                 onChangeText={text => handleInputChange('bio',text) }
             />
-            <TouchableOpacity onPress={handleSubmit} style={[!loading ? (styles.button):(styles.buttonDisabled), {width: '100%'}]} disabled={loading}>
-                <Text style={{color: 'white', fontWeight: 'bold'}}>{!loading ? ('Cambiar perfil'):('Enviando...') }</Text>
+            <TouchableOpacity onPress={handleSubmit} style={[!loadingSubmit ? (styles.button):(styles.buttonDisabled), {width: '100%'}]} disabled={loadingSubmit}>
+                <Text style={{color: 'white', fontWeight: 'bold'}}>{!loadingSubmit ? ('Cambiar perfil'):('Enviando...') }</Text>
             </TouchableOpacity>
 
 
