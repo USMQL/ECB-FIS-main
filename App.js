@@ -15,6 +15,7 @@ import UploadScreen from './screens/UploadScreen';
 
 // Componentes.
 import SignOutButton from './components/SignOutButton';
+import RecPasswordScreen from './screens/RecPasswordScreen';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -23,32 +24,33 @@ export default function App() {
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
   const [userdb, setUserdb] = useState(null);
-  let unsubscribeUserDB = null;
+  let unsubscribeUserDB = () => (null);
 
   const handleRefreshUserDBApp = async (data) => {
     await setUserdb(data);
   }
+  useEffect(() => {
+    const suscribirCambiosUserDB = async () => {
+      unsubscribeUserDB = await subscribeUserDB(handleRefreshUserDBApp);
+    }
+    suscribirCambiosUserDB();
+    return () => (unsubscribeUserDB());
+  });
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (user) => {
       setUser(user);
       if (user){
-        await unsubscribeUserDB;
-        unsubscribeUserDB = await subscribeUserDB(handleRefreshUserDBApp);
         await refreshUserDB(user);
       }
       setLoading(false);
     });
-    return () => {
-      unsubscribeUserDB();
-      unsubscribe();
-    };
+    return () => (unsubscribe());
   }, []);
 
   if (loading) {
     return (<LoadingScreen/>);
   }
-  
   return (
     <NavigationContainer>
       {!user? (
@@ -58,41 +60,25 @@ export default function App() {
             title: '',
             headerTransparent: true,
           }}/>
+          <Stack.Screen name="RecuperarContrasena" component={RecPasswordScreen} options={{
+            title: '',
+            headerTransparent: true,
+            headerTitleAlign: 'center',
+            headerBackTitle: "Volver",
+            headerBackTitleVisible: true,
+            headerBackTitleStyle: {fontWeight: 'bold'},
+          }}/>
         </Stack.Navigator>
       ) : (
         // El usuario se encuentra logeado.
         <Tab.Navigator initialRouteName={'Home'} screenOptions={tabNavigatorScreenOptions}>
           <Tab.Screen name="Home" component={HomeScreen} options={{
             title: 'Inicio',
-            // headerTransparent: true,
-            headerStyle: {
-              backgroundColor: '#fff',
-              elevation: 0,
-              shadowOpacity: 0,
-              borderBottomWidth: 0,
-            },
-            headerTitleAlign: 'center',
-            headerTintColor: '#000',
-            headerTitleStyle: {
-              fontWeight: 'bold',
-            },
             headerLeft: () => (<SignOutButton/>),
           }}/>
           {userdb?.isProfesor ? (
           <Tab.Screen name="Upload" component={UploadScreen} options={{
             title: 'Subir Ejercicio',
-            // headerTransparent: true,
-            headerStyle: {
-              backgroundColor: '#fff',
-              elevation: 0,
-              shadowOpacity: 0,
-              borderBottomWidth: 0,
-            },
-            headerTitleAlign: 'center',
-            headerTintColor: '#000',
-            headerTitleStyle: {
-              fontWeight: 'bold',
-            },
           }}/>
           ):(null)}
         </Tab.Navigator>
@@ -102,6 +88,7 @@ export default function App() {
 }
 
 const tabNavigatorScreenOptions = {
+  // --- TabBar ---
   tabBarStyle: {
     // position: 'absolute',
     height: 80,
@@ -109,6 +96,19 @@ const tabNavigatorScreenOptions = {
   },
   tabBarLabelStyle: {
     fontSize: 16,
+    fontWeight: 'bold',
+  },
+  // --- Header ---
+  // headerTransparent: true,
+  headerStyle: {
+    backgroundColor: '#fff',
+    elevation: 0,
+    shadowOpacity: 0,
+    borderBottomWidth: 0,
+  },
+  headerTitleAlign: 'center',
+  headerTintColor: '#000',
+  headerTitleStyle: {
     fontWeight: 'bold',
   },
 }

@@ -4,18 +4,22 @@ import { useCallback, useEffect, useState } from 'react';
 import { auth } from '../firebase-config'
 import { subscribeUserDB, refreshUserDB } from '../utils/initUser';
 import { exitApp } from '../utils/backAction'
+import LoadingScreen from './LoadingScreen';
 
 export default function HomeScreen({ navigation }) {
+    const [loadingUserData, setLoadingUserData] = useState(true);
     const user = auth.currentUser;
     const [userDB, setUserDB] = useState(null);
     const [refreshing, setRefreshing] = useState(false);
-    let unsubscribeUserDB = null;
+    let unsubscribeUserDB = () => (null);
 
+    // Cuando se ejecuta refreshUserDB, se actualiza el estado de userDB.
     const handleRefreshUserDBHome = async (data) => {
         await setUserDB(data);
+        setLoadingUserData(false);
       }
-
     useEffect(() => {
+        // Suscribirse a los cambios en la variable userDB del usuario.
         const upUserDB = async () => {
             unsubscribeUserDB = await subscribeUserDB(handleRefreshUserDBHome);
             await refreshUserDB(user);
@@ -35,14 +39,17 @@ export default function HomeScreen({ navigation }) {
         setRefreshing(true);
         refreshUserDB(user).then(() => setRefreshing(false));
     }, []);
-        
+    
+    if (loadingUserData) {
+        return (<LoadingScreen/>)
+    }
     return (
         <View style={styles.container}>
             <ScrollView contentContainerStyle={styles.container} refreshControl={
                 <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
             }>
                 <Text style={styles.title}>ECB-FIS</Text>
-                <Text style={{margin: 20}}>Bienvenido <Text style={{fontWeight: 'bold'}}>{user.email.split('@')[0]}</Text>!</Text>
+                <Text style={{margin: 20}}>Bienvenido <Text style={{fontWeight: 'bold'}}>{userDB.displayName}</Text>!</Text>
                 
                 <TouchableOpacity onPress={() => (alert(userDB.displayName))} style={[styles.button, {}]}>
                     <Text style={{color: 'white', fontWeight: 'bold'}}>Generar Ejercicio</Text>
