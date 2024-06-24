@@ -1,13 +1,13 @@
 import { StyleSheet, Text, TouchableOpacity } from 'react-native';
 import { confirmBackAction } from '../utils/backAction';
-import { Image } from 'expo-image';
+import { Ionicons } from '@expo/vector-icons';
 
 
 export default function GoBackButton({ navigation }) {
     const handleConfirmBackAction = () => confirmBackAction(navigation);
     return (
         <TouchableOpacity style={styles.button} onPress={handleConfirmBackAction}>
-            <Image style={{width: "100%", height: '100%'}} source="https://img.icons8.com/ios-filled/50/back.png"></Image>
+            <Ionicons name="arrow-back" size={24} color="black" />
         </TouchableOpacity>
     );
 }
