@@ -10,6 +10,7 @@ import { refreshUserDB, subscribeUserDB } from './utils/initUser';
 // Pantallas.
 import LoadingScreen from './screens/LoadingScreen';
 import LoginScreen from './screens/LoginScreen';
+import RecoveryPasswordScreen from './screens/RecoveryPasswordScreen';
 import HomeScreen from './screens/HomeScreen';
 import UploadScreen from './screens/UploadScreen';
 
@@ -57,6 +58,15 @@ export default function App() {
           <Stack.Screen name="Login" component={LoginScreen} options={{
             title: '',
             headerTransparent: true,
+          }}/>
+          <Stack.Screen name="RecoveryPassword" component={RecoveryPasswordScreen} options={{
+            title: '',
+            headerTransparent: true,
+            headerBackTitle: "volver",
+            headerBackTitleStyle: {
+              color: '#000',
+              fontWeight: 'bold',
+            }
           }}/>
         </Stack.Navigator>
       ) : (

@@ -21,8 +21,10 @@ import { exitApp } from "../utils/backAction";
 import { initUserDB } from "../utils/initUser";
 
 const errorMessages = {
-  "auth/network-request-failed": "Error de red, verifique su conexión a internet",
-  "auth/email-already-in-use": "La dirección de correo electrónico ya está en uso",
+  "auth/network-request-failed":
+    "Error de red, verifique su conexión a internet",
+  "auth/email-already-in-use":
+    "La dirección de correo electrónico ya está en uso",
   "auth/invalid-email": "La dirección de correo electrónico no es válida",
   "auth/invalid-credential": "Credenciales no válidas",
   "auth/weak-password": "La contraseña es muy débil",
@@ -36,7 +38,10 @@ export default function Login({ navigation }) {
 
   // Salir de la aplicación.
   useEffect(() => {
-    const backHandler = BackHandler.addEventListener("hardwareBackPress", exitApp);
+    const backHandler = BackHandler.addEventListener(
+      "hardwareBackPress",
+      exitApp
+    );
     return () => backHandler.remove();
   }, []);
 
@@ -88,6 +93,15 @@ export default function Login({ navigation }) {
         placeholder="******"
         secureTextEntry
       />
+      <Text style={[styles.message,{marginBottom:10}]}>
+        ¿Olvidaste tu contraseña?{" "}
+        <Text
+          style={styles.messageBlack}
+          onPress={() => navigation.navigate("RecoveryPassword")}
+        >
+          Recuperar contraseña
+        </Text>
+      </Text>
 
       <View style={styles.checkboxContainer}>
         <Checkbox value={rememberMe} onValueChange={setRememberMe} />
