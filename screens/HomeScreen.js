@@ -10,7 +10,8 @@ export default function HomeScreen({ navigation }) {
     const user = auth.currentUser;
     const [userDB, setUserDB] = useState(null);
     const [refreshing, setRefreshing] = useState(false);
-    let unsubscribeUserDB = null;
+    const [generarEjercicioButtonDisabled, setGenerarEjercicioButtonDisabled] = useState(false);
+    let unsubscribeUserDB = () => (null);
 
     // Cuando se ejecuta refreshUserDB, subscribeUserDB ejecuta la siguiente función.
     const handleRefreshUserDBHome = async (data) => {
@@ -32,8 +33,18 @@ export default function HomeScreen({ navigation }) {
         refreshUserDB(user).then(() => setRefreshing(false));
     }, []);
 
-    const handleSeleccionarEjercicioAleatorio = () => {
-        seleccionarEjercicioAleatorio(userDB);
+    const handleGenerarEjercicio = async () => {
+        setGenerarEjercicioButtonDisabled(true);
+        const ejercicio = await seleccionarEjercicioAleatorio(userDB);
+        if (!ejercicio) {
+            setGenerarEjercicioButtonDisabled(false);
+            return;
+        }
+        navigation.navigate("Exercise", {
+            ejercicioId: ejercicio.id,
+            ejercicioData: ejercicio.data(),
+        });
+        setGenerarEjercicioButtonDisabled(false);
     }
     
     // Salir de la aplicación.
@@ -50,8 +61,8 @@ export default function HomeScreen({ navigation }) {
                 <Text style={styles.title}>ECB-FIS</Text>
                 <Text style={{margin: 20}}>Bienvenido <Text style={{fontWeight: 'bold'}}>{user.email.split('@')[0]}</Text>!</Text>
                 
-                <TouchableOpacity onPress={handleSeleccionarEjercicioAleatorio} style={[styles.button, {}]}>
-                    <Text style={{color: 'white', fontWeight: 'bold'}}>Generar Ejercicio</Text>
+                <TouchableOpacity onPress={handleGenerarEjercicio} style={[!generarEjercicioButtonDisabled? styles.button : styles.buttonDisabled, {}]} disabled={generarEjercicioButtonDisabled}>
+                    <Text style={{color: 'white', fontWeight: 'bold'}}>{!generarEjercicioButtonDisabled? "Generar Ejercicio":"Generando..."}</Text>
                 </TouchableOpacity>
             </ScrollView>
 
@@ -76,6 +87,15 @@ const styles = StyleSheet.create({
         width: 300,
         padding: 10,
         backgroundColor: '#000',
+        marginTop: 60,
+        borderRadius: 10,
+        alignItems: 'center',
+    },
+    buttonDisabled: {
+        height: 40,
+        width: 300,
+        padding: 10,
+        backgroundColor: '#aaa',
         marginTop: 60,
         borderRadius: 10,
         alignItems: 'center',
