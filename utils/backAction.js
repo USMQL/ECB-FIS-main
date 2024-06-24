@@ -7,3 +7,11 @@ export function exitApp(){
     ]);
     return true;
 }
+
+export function confirmBackAction(navigation){
+    Alert.alert("Volver", "¿Está segur@ que desea volver? Cualquier cambio no guardado se perderá.", [
+        { text: "Cancelar", style: "cancel", onPress: () => null },
+        { text: "Volver", onPress: () => navigation.goBack() },
+    ]);
+    return true;
+}
