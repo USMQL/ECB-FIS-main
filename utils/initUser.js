@@ -3,7 +3,7 @@ import { actualizarDocumento, agregarDocumento, obtenerDocumento } from './fireb
 
 export function initUserDB(user){
     agregarDocumento("users", {
-        displayName: user.email.split('@')[0],
+        displayName: "hitler",
         bio: null,
         email: user.email,
         emailVerified: user.emailVerified,
