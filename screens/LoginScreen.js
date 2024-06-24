@@ -89,6 +89,16 @@ export default function Login({ navigation }) {
         secureTextEntry
       />
 
+      <Text style={[styles.message,{marginBottom:10}]}>
+        ¿Olvidaste tu contraseña?{" "}
+        <Text
+          style={styles.messageBlack}
+          onPress={() => navigation.navigate("RecuperarContraseña")}
+        >
+          Recuperar contraseña
+        </Text>
+      </Text>
+
       <View style={styles.checkboxContainer}>
         <Checkbox value={rememberMe} onValueChange={setRememberMe} />
         <Text style={styles.checkboxLabel}>Mantener sesión abierta</Text>

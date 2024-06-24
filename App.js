@@ -15,6 +15,7 @@ import UploadScreen from './screens/UploadScreen';
 
 // Componentes.
 import SignOutButton from './components/SignOutButton';
+import RecoveryPasswordScreen from './screens/RecPasswordScreen';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -57,6 +58,15 @@ export default function App() {
           <Stack.Screen name="Login" component={LoginScreen} options={{
             title: '',
             headerTransparent: true,
+          }}/>
+          <Stack.Screen name="RecuperarContrasena" component={RecoveryPasswordScreen} options={{
+            title: '',
+            headerTransparent: true,
+            headerBackTitle: "volver",
+            headerBackTitleStyle: {
+              color: '#000',
+              fontWeight: 'bold',
+            }
           }}/>
         </Stack.Navigator>
       ) : (
