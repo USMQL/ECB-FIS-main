@@ -19,6 +19,7 @@ export default function ProfileScreen({ navigation }) {
 
     const handleUpdateUserDB = async () => {
         await updateUserDB(user);
+        
       }
     
     // Actualizar el estado del formulario.
@@ -52,7 +53,7 @@ export default function ProfileScreen({ navigation }) {
                 bio: variable.bio,
             };
             await updateUserDB(user, userData)  
-
+            await refreshUserDB(user);
             
         } catch (error) {
             console.error('Error añadiendo el ejercicio: ', error);
