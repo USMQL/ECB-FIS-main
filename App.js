@@ -16,6 +16,7 @@ import ExerciseScreen from './screens/ExerciseScreen';
 
 // Componentes.
 import SignOutButton from './components/SignOutButton';
+import RecPasswordScreen from './screens/RecPasswordScreen';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -29,27 +30,28 @@ export default function App() {
   const handleRefreshUserDBApp = async (data) => {
     await setUserdb(data);
   }
+  useEffect(() => {
+    const suscribirCambiosUserDB = async () => {
+      unsubscribeUserDB = await subscribeUserDB(handleRefreshUserDBApp);
+    }
+    suscribirCambiosUserDB();
+    return () => (unsubscribeUserDB());
+  });
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (user) => {
       setUser(user);
       if (user){
-        await unsubscribeUserDB;
-        unsubscribeUserDB = await subscribeUserDB(handleRefreshUserDBApp);
         await refreshUserDB(user);
       }
       setLoading(false);
     });
-    return () => {
-      unsubscribeUserDB();
-      unsubscribe();
-    };
+    return () => (unsubscribe());
   }, []);
 
   if (loading) {
     return (<LoadingScreen/>);
   }
-
   return (
     <NavigationContainer>
       {!user? (
@@ -58,6 +60,14 @@ export default function App() {
           <Stack.Screen name="Login" component={LoginScreen} options={{
             title: '',
             headerTransparent: true,
+          }}/>
+          <Stack.Screen name="RecuperarContrasena" component={RecPasswordScreen} options={{
+            title: '',
+            headerTransparent: true,
+            headerTitleAlign: 'center',
+            headerBackTitle: "Volver",
+            headerBackTitleVisible: true,
+            headerBackTitleStyle: {fontWeight: 'bold'},
           }}/>
         </Stack.Navigator>
       ) : (
@@ -72,7 +82,7 @@ export default function App() {
           title: 'Subir Ejercicio',
         }}/>
         ):(null)}
-        <Stack.Screen name="Exercise" component={ExerciseScreen} options={{
+        <Tab.Screen name="Exercise" component={ExerciseScreen} options={{
           title: 'Ejercicio',
           tabBarStyle: {display: 'none'},
           tabBarItemStyle: {display: 'none'},
@@ -96,7 +106,7 @@ const tabNavigatorScreenOptions = {
     fontSize: 16,
     fontWeight: 'bold',
   },
-
+  
   // --- Header ---
   // headerTransparent: true,
   headerStyle: {

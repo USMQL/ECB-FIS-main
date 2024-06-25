@@ -5,17 +5,20 @@ import { auth } from '../firebase-config'
 import { subscribeUserDB, refreshUserDB } from '../utils/initUser';
 import { exitApp } from '../utils/backAction'
 import { seleccionarEjercicioAleatorio } from '../utils/obtenerEjercicio';
+import LoadingScreen from './LoadingScreen';
 
 export default function HomeScreen({ navigation }) {
+    const [loadingUserData, setLoadingUserData] = useState(true);
     const user = auth.currentUser;
     const [userDB, setUserDB] = useState(null);
     const [refreshing, setRefreshing] = useState(false);
     const [generarEjercicioButtonDisabled, setGenerarEjercicioButtonDisabled] = useState(false);
     let unsubscribeUserDB = () => (null);
 
-    // Cuando se ejecuta refreshUserDB, subscribeUserDB ejecuta la siguiente función.
+    // Cuando se ejecuta refreshUserDB, se actualiza el estado de userDB.
     const handleRefreshUserDBHome = async (data) => {
         await setUserDB(data);
+        setLoadingUserData(false);
     }
     useEffect(() => {
         // Suscribirse a los cambios en la variable userDB del usuario.
@@ -52,14 +55,23 @@ export default function HomeScreen({ navigation }) {
         const backHandler = BackHandler.addEventListener("hardwareBackPress", exitApp);
         return () => backHandler.remove();
     }, []);
+
+    // Actualizar datos del usuario.
+    const onRefresh = useCallback(() => {
+        setRefreshing(true);
+        refreshUserDB(user).then(() => setRefreshing(false));
+    }, []);
     
+    if (loadingUserData) {
+        return (<LoadingScreen/>)
+    }
     return (
         <View style={styles.container}>
             <ScrollView contentContainerStyle={styles.container} refreshControl={
                 <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
             }>
                 <Text style={styles.title}>ECB-FIS</Text>
-                <Text style={{margin: 20}}>Bienvenido <Text style={{fontWeight: 'bold'}}>{user.email.split('@')[0]}</Text>!</Text>
+                <Text style={{margin: 20}}>Bienvenido <Text style={{fontWeight: 'bold'}}>{userDB.displayName}</Text>!</Text>
                 
                 <TouchableOpacity onPress={handleGenerarEjercicio} style={[!generarEjercicioButtonDisabled? styles.button : styles.buttonDisabled, {}]} disabled={generarEjercicioButtonDisabled}>
                     <Text style={{color: 'white', fontWeight: 'bold'}}>{!generarEjercicioButtonDisabled? "Generar Ejercicio":"Generando..."}</Text>
