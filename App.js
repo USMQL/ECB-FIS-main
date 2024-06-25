@@ -24,26 +24,28 @@ export default function App() {
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
   const [userdb, setUserdb] = useState(null);
-  let unsubscribeUserDB = null;
+  let unsubscribeUserDB = () => (null);
 
   const handleRefreshUserDBApp = async (data) => {
     await setUserdb(data);
   }
+  useEffect(() => {
+    const suscribirCambiosUserDB = async () => {
+      unsubscribeUserDB = await subscribeUserDB(handleRefreshUserDBApp);
+    }
+    suscribirCambiosUserDB();
+    return () => (unsubscribeUserDB());
+  });
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (user) => {
       setUser(user);
       if (user){
-        await unsubscribeUserDB;
-        unsubscribeUserDB = await subscribeUserDB(handleRefreshUserDBApp);
         await refreshUserDB(user);
       }
       setLoading(false);
     });
-    return () => {
-      unsubscribeUserDB();
-      unsubscribe();
-    };
+    return () => (unsubscribe());
   }, []);
 
   if (loading) {
