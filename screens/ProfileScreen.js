@@ -1,5 +1,5 @@
 import { auth } from '../firebase-config'
-import { StyleSheet, Text, View, TextInput, Button, Alert, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, TextInput, Button, Alert, TouchableOpacity,ScrollView } from 'react-native';
 import { subscribeUserDB, refreshUserDB, updateUserDB } from '../utils/initUser';
 import { useEffect, useState } from 'react';
 import { actualizarDocumento , agregarDocumento, obtenerDocumento } from '../utils/firebaseUtils';
@@ -65,27 +65,28 @@ export default function ProfileScreen({ navigation }) {
     return (
 
         
-        <View >
+        <View>
+            <ScrollView>
             {/* mostrar el nombre */}
-            <Text style={{margin: 20}}>Bienvenido <Text style={{fontWeight: 'bold'}}>{userDB.displayName}</Text>!</Text>
+            <Text style={{margin: 20}}>Nombre de usuario:  <Text style={{fontWeight: 'bold'}}>{userDB.displayName}</Text></Text>
             {/* escribir el nombre */}
             <TextInput
                 style={styles.inputNombre}
-                placeholder="Tu nombre"
+                placeholder="Cambiar nombre de usuario"
                 value={variable.displayName}
                 onChangeText={text => handleInputChange('displayName',text) }
             />
             {/* */}
-            <Text style={{margin: 20}}>Tu biografia <Text style={{fontWeight: 'bold'}}>{userDB.bio}</Text>!</Text>
+            <Text style={{margin: 20}}>Tu biografia: <Text style={{fontWeight: 'bold'}}>{userDB.bio}</Text>!</Text>
             {/* escribir la biografia */}
             <TextInput
                 style={styles.inputBio}
-                placeholder="Tu biografia"
+                placeholder="Cambiar biografia"
                 value={variable.bio}
                 onChangeText={text => handleInputChange('bio',text) }
             />
             <TouchableOpacity onPress={handleSubmit} style={[!loadingSubmit ? (styles.button):(styles.buttonDisabled), {width: '100%'}]} disabled={loadingSubmit}>
-                <Text style={{color: 'white', fontWeight: 'bold'}}>{!loadingSubmit ? ('Cambiar perfil'):('Enviando...') }</Text>
+                <Text style={{color: 'white', fontWeight: 'bold'}}>{!loadingSubmit ? ('Guardar cambios del perfil'):('Enviando...') }</Text>
             </TouchableOpacity>
 
 
@@ -93,7 +94,7 @@ export default function ProfileScreen({ navigation }) {
 
 
 
-
+            </ScrollView>
         </View>
         
     );

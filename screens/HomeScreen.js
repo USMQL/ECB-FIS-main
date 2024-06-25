@@ -42,7 +42,7 @@ export default function HomeScreen({ navigation }) {
                 <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
             }>
                 <Text style={styles.title}>ECB-FIS</Text>
-                <Text style={{margin: 20}}>Bienvenido <Text style={{fontWeight: 'bold'}}>{userDB.displayName}</Text>!</Text>
+                <Text style={{margin: 20}}>Bienvenido <Text style={{fontWeight: 'bold'}}>{user.displayName}</Text>!</Text>
                 
                 <TouchableOpacity onPress={() => (alert(userDB.displayName))} style={[styles.button, {}]}>
                     <Text style={{color: 'white', fontWeight: 'bold'}}>Generar Ejercicio</Text>
