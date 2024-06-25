@@ -55,12 +55,6 @@ export default function HomeScreen({ navigation }) {
         const backHandler = BackHandler.addEventListener("hardwareBackPress", exitApp);
         return () => backHandler.remove();
     }, []);
-
-    // Actualizar datos del usuario.
-    const onRefresh = useCallback(() => {
-        setRefreshing(true);
-        refreshUserDB(user).then(() => setRefreshing(false));
-    }, []);
     
     if (loadingUserData) {
         return (<LoadingScreen/>)
