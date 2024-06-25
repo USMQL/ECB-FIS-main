@@ -20,6 +20,7 @@ export function initUserDB(user){
           ejerciciosCreados: [],
           ejerciciosEnCurso: [],
           ejerciciosTerminados: [],
+          ejerciciosTerminadosIds: [],
           ejerciciosIntentados: [],
           puntajeTotal: {
             ejerciciosDiarios: 0,
@@ -41,22 +42,32 @@ export function initUserDB(user){
 export async function getUserDB(user){
   if (!user) return null;
   let doc = null;
-
-  async function obtDoc(){
-    doc = await obtenerDocumento("users", user.uid).catch((error) => {
-      Alert.alert("Ups!", "Ha ocurrido un error al intentar obtener los datos del usuario", [
-        {text: "Reintentar", style: 'default', onPress: obtDoc()}
-      ]);
-    });
+  while (true){
+    try{
+      doc = await obtenerDocumento("users", user.uid);
+      return doc?.data()? (doc.data()) : (null);
+    } catch(error){
+      await new Promise((resolve) => {
+        Alert.alert("Ups!", "Ha ocurrido un error al intentar obtener los datos del usuario", [
+          {text: "Reintentar", style: 'default', onPress: () => resolve(true)},
+        ]);
+      });
+    }
   }
-  await obtDoc();
-  return doc?.data()? (doc.data()) : (null);
 }
 
 export async function updateUserDB(user, data){
-  return await actualizarDocumento("users", data, user.uid).catch((error) => {
-    Alert.alert("Ups!", "Ha ocurrido un error al intentar actualizar los datos del usuario");
-  });
+  while (true){
+    try{
+      return await actualizarDocumento("users", data, user.uid);
+    } catch(error){
+      await new Promise((resolve) => {
+        Alert.alert("Ups!", "Ha ocurrido un error al intentar actualizar los datos del usuario", [
+          {text: "Reintentar", style: 'default', onPress: () => resolve(true)},
+        ]);
+      });
+    }
+  }
 }
 
 const subscribers = [];

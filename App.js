@@ -12,6 +12,7 @@ import LoadingScreen from './screens/LoadingScreen';
 import LoginScreen from './screens/LoginScreen';
 import HomeScreen from './screens/HomeScreen';
 import UploadScreen from './screens/UploadScreen';
+import ExerciseScreen from './screens/ExerciseScreen';
 
 // Componentes.
 import SignOutButton from './components/SignOutButton';
@@ -71,17 +72,24 @@ export default function App() {
         </Stack.Navigator>
       ) : (
         // El usuario se encuentra logeado.
-        <Tab.Navigator initialRouteName={'Home'} screenOptions={tabNavigatorScreenOptions}>
-          <Tab.Screen name="Home" component={HomeScreen} options={{
-            title: 'Inicio',
-            headerLeft: () => (<SignOutButton/>),
-          }}/>
-          {userdb?.isProfesor ? (
-          <Tab.Screen name="Upload" component={UploadScreen} options={{
-            title: 'Subir Ejercicio',
-          }}/>
-          ):(null)}
-        </Tab.Navigator>
+      <Tab.Navigator initialRouteName={'Home'} screenOptions={tabNavigatorScreenOptions}>
+        <Tab.Screen name="Home" component={HomeScreen} options={{
+          title: 'Inicio',
+          headerLeft: () => (<SignOutButton/>),
+        }}/>
+        {userdb?.isProfesor ? (
+        <Tab.Screen name="Upload" component={UploadScreen} options={{
+          title: 'Subir Ejercicio',
+        }}/>
+        ):(null)}
+        <Tab.Screen name="Exercise" component={ExerciseScreen} options={{
+          title: 'Ejercicio',
+          tabBarStyle: {display: 'none'},
+          tabBarItemStyle: {display: 'none'},
+          unmountOnBlur: true,
+          
+        }}/>
+      </Tab.Navigator>
       )}
     </NavigationContainer>
   );
@@ -98,6 +106,7 @@ const tabNavigatorScreenOptions = {
     fontSize: 16,
     fontWeight: 'bold',
   },
+  
   // --- Header ---
   // headerTransparent: true,
   headerStyle: {
