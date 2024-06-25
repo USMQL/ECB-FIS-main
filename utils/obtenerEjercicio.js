@@ -7,7 +7,7 @@ export async function seleccionarEjercicioAleatorio(userData){
     try{
         const ejercicios = await obtenerColeccion("ejercicios");
         const ejerciciosDisponibles = ejercicios.docs.filter((doc) => (
-            !doc.data().disabled && doc.data().tipoEjercicio === "Normal" && !userData.stats.ejerciciosTerminados.includes(doc.id)
+            !doc.data().disabled && doc.data().tipoEjercicio === "Normal" && !userData.stats.ejerciciosTerminadosIds.includes(doc.id)
         ));
         if (ejerciciosDisponibles.length === 0) {
             Alert.alert("No hay ejercicios disponibles", "Por favor, intenta más tarde");

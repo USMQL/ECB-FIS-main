@@ -1,22 +1,29 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, BackHandler, Text, View, Modal, TouchableOpacity, ScrollView, TextInput } from 'react-native';
+import { StyleSheet, BackHandler, Text, View, Modal, TouchableOpacity, ScrollView, TextInput, Alert } from 'react-native';
 import { useEffect, useState } from 'react';
 import { auth } from '../firebase-config'
-import { subscribeUserDB, refreshUserDB } from '../utils/initUser';
+import { subscribeUserDB, refreshUserDB, updateUserDB } from '../utils/initUser';
 import { confirmBackAction } from '../utils/backAction'
 import GoBackButton from '../components/GoBackButton';
 import { descargarArchivo } from '../utils/firebaseUtils';
 import { Image } from 'expo-image';
+import LoadingScreen from './LoadingScreen';
+import { arrayUnion } from 'firebase/firestore';
+import { set } from 'firebase/database';
 
 
 export default function ExerciseScreen({ navigation, route }) {
     const { ejercicioId, ejercicioData } = route.params;
-    // const user = auth.currentUser;
+    const [loadingUserData, setLoadingUserData] = useState(true);
+    const user = auth.currentUser;
     const [userDB, setUserDB] = useState(null);
     let unsubscribeUserDB = () => (null);
-
+    
+    const [resultadoModalVisible, setResultadoModalVisible] = useState(false);
     const [formulaVisible, setFormulaVisible] = useState(false);
     const [respuestaIngresada, setRespuestaIngresada] = useState(null);
+    const [puntajeObtenido, setPuntajeObtenido] = useState(ejercicioData.puntaje);
+    const [isRespuestaCorrecta, setIsRespuestaCorrecta] = useState(null);
     const [imagenEjercicio, setImagenEjercicio] = useState(null);
     const [imagenFormula, setImagenFormula] = useState(null);
     async function getImagenes() {
@@ -24,23 +31,20 @@ export default function ExerciseScreen({ navigation, route }) {
         ejercicioData.formulaURL && setImagenFormula(await descargarArchivo(ejercicioData.formulaURL));
     }
 
-    const handleInputChange = (value) => {
-        setRespuestaIngresada(value);
+    // Cuando se ejecuta refreshUserDB, subscribeUserDB ejecuta la siguiente función.
+    const handleRefreshUserDBExercise = async (data) => {
+        await setUserDB(data);
+        setLoadingUserData(false);
     }
-
-    // // Cuando se ejecuta refreshUserDB, subscribeUserDB ejecuta la siguiente función.
-    // const handleRefreshUserDBExercise = async (data) => {
-    //     await setUserDB(data);
-    // }
-    // useEffect(() => {
-    //     // Suscribirse a los cambios en la variable userDB del usuario.
-    //     const upUserDB = async () => {
-    //         unsubscribeUserDB = await subscribeUserDB(handleRefreshUserDBExercise);
-    //         await refreshUserDB(user);
-    //     }
-    //     upUserDB();
-    //     return () => unsubscribeUserDB();
-    // }, [user]);
+    useEffect(() => {
+        // Suscribirse a los cambios en la variable userDB del usuario.
+        const upUserDB = async () => {
+            unsubscribeUserDB = await subscribeUserDB(handleRefreshUserDBExercise);
+            await refreshUserDB(user);
+        }
+        upUserDB();
+        return () => unsubscribeUserDB();
+    }, [user]);
 
     useEffect(() => {
         if (ejercicioData.titulo) {
@@ -51,6 +55,40 @@ export default function ExerciseScreen({ navigation, route }) {
         });
         getImagenes();
     }, []);
+
+    // Función para manejar el cambio en el input de respuesta.
+    const handleInputChange = (value) => {
+        setRespuestaIngresada(value);
+    }
+    // Función para enviar la respuesta ingresada.
+    const handleEnviarRespuesta = async () => {
+        if (!respuestaIngresada) {
+            Alert.alert("Hey!", 'Ingrese una respuesta.');
+            return;
+        }
+        // Verificar si la respuesta ingresada es correcta.
+        setIsRespuestaCorrecta((ejercicioData.respuesta === respuestaIngresada));
+        setResultadoModalVisible(true);
+        console.log('Validando datos:', '"'+respuestaIngresada+'"', '"'+ejercicioData.respuesta+'"');
+        if (!(ejercicioData.respuesta === respuestaIngresada)) {
+            if (puntajeObtenido > 0) setPuntajeObtenido(puntajeObtenido - 2);
+            return;
+        }
+        console.log('Respuesta correcta!');
+
+        await updateUserDB(user, {
+            "stats.ejerciciosTerminados": arrayUnion({
+                id: ejercicioId,
+                respuestaIngresada: respuestaIngresada,
+                isRespuestaCorrecta: isRespuestaCorrecta,
+                puntajeObtenido: puntajeObtenido,
+            }),
+            "stats.ejerciciosTerminadosIds": arrayUnion(ejercicioId),
+            "stats.puntajeTotal.ejerciciosGenerados": userDB.stats.puntajeTotal.ejerciciosGenerados + puntajeObtenido,
+        });
+        await refreshUserDB(user, userDB);
+        return;
+    }
 
     // Volver a la pantalla anterior.
     useEffect(() => {
@@ -65,11 +103,43 @@ export default function ExerciseScreen({ navigation, route }) {
         return () => backHandler.remove();
     }, []);
 
-    
+    function ResultadoModal() {
+        const handleCloseModal = () => {
+            if (isRespuestaCorrecta) {
+                navigation.navigate("Home");
+            } else {
+                setResultadoModalVisible(!resultadoModalVisible);
+            }
+        }
+        return (
+            <Modal visible={resultadoModalVisible} animationType='fade' transparent={true} onRequestClose={handleCloseModal}>
+                <View style={resultadoModal.centeredView}>
+                    <View style={resultadoModal.modalView}>
+                        <Text style={resultadoModal.modalText}>Resultado del ejercicio</Text>
+                        {isRespuestaCorrecta? (
+                            <Text style={{marginBottom: 20}}></Text>
+                        ) : (
+                            <Text style={{marginBottom: 20, textAlign: 'center'}}>Vaya, respuesta incorrecta, intenta de nuevo.</Text>
+                        )}
+                        <Text style={{marginBottom: 20}}>Respuesta ingresada: {respuestaIngresada}</Text>
+                        {isRespuestaCorrecta && <Text style={{marginBottom: 20}}>Puntaje obtenido: {puntajeObtenido}</Text>}
+
+                        <TouchableOpacity style={[resultadoModal.button]} onPress={handleCloseModal}>
+                        {isRespuestaCorrecta? (
+                            <Text style={resultadoModal.buttonText}>Cerrar</Text>
+                        ) : (
+                            <Text style={resultadoModal.buttonText}>Volver a intentar</Text>
+                        )}
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </Modal>
+        );
+    }
     function FormulaModal() {
         return (
             <Modal visible={formulaVisible} animationType="slide" transparent={true} onRequestClose={() => (setFormulaVisible(!formulaVisible))}>
-                <View style={stylesModal.centeredView} onPress={() => setFormulaVisible(!formulaVisible)}>
+                <View style={stylesModal.centeredView}>
                     <View style={stylesModal.modalView}>
                         <Text style={stylesModal.modalText}>Formula del ejercicio</Text>
                         {imagenFormula? <Image source={imagenFormula} style={{width: "100%", height: 200, marginBottom: 20}} contentFit='contain' /> : <Text style={{marginBottom: 20}}>No hay formula adjunta.</Text>}
@@ -81,13 +151,16 @@ export default function ExerciseScreen({ navigation, route }) {
             </Modal>
         );
     }
+    if (loadingUserData) {
+        return (<LoadingScreen/>);
+    }
     return (
         <View style={{flex: 1, backgroundColor: '#fff'}}>
             <ScrollView contentContainerStyle={styles.container}>
             <Text style={styles.description}>{ejercicioData.contenido}</Text>
 
             {imagenEjercicio && (
-                <Image source={imagenEjercicio} style={{width: "100%", height: 200, marginBottom: 20}} contentFit='contain' />
+                <Image source={imagenEjercicio} style={{width: "100%", height: 200, marginBottom: 20, backgroundColor: '#fff'}} contentFit='contain' />
             )}
 
             {imagenFormula && (
@@ -120,13 +193,14 @@ export default function ExerciseScreen({ navigation, route }) {
                 )}
                 </View>
                 
-                <TouchableOpacity style={styles.button} onPress={() => console.log('hola')}>
+                <TouchableOpacity style={styles.button} onPress={handleEnviarRespuesta}>
                 <Text style={styles.buttonText}>Enviar respuesta</Text>
                 </TouchableOpacity>
             </View>
             </ScrollView>
             
             {imagenFormula && <FormulaModal/>}
+            <ResultadoModal/>
             <StatusBar style="auto" />
         </View>
     );
@@ -174,7 +248,7 @@ const styles = StyleSheet.create({
         borderColor: '#ccc',
         padding: 20,
         // alignItems: 'center',
-        borderTopWidth: 1,
+        // borderTopWidth: 1,
         
     },
     subtitle: {
@@ -255,5 +329,48 @@ const stylesModal = StyleSheet.create({
         marginBottom: 15,
         textAlign: 'center',
         fontWeight: 'bold',
+      },
+});
+
+const resultadoModal = StyleSheet.create({
+    centeredView: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0,0,0,0.5)',
+      },
+      modalView: {
+        width: '80%',
+        backgroundColor: '#fff',
+        borderRadius: 20,
+        borderWidth: 1,
+        borderColor: '#E0E0E0',
+        padding: 35,
+        alignItems: 'center',
+        shadowColor: '#000',
+        shadowOpacity: 0.25,
+        shadowRadius: 500,
+        elevation: 5,
+      },
+      modalText: {
+        marginBottom: 15,
+        textAlign: 'center',
+        fontSize: 18,
+        fontWeight: 'bold',
+      },
+      button: {
+        width: '80%',
+        alignItems: 'center',
+        backgroundColor: '#2a5954',
+        padding: 10,
+        borderRadius: 20,
+        margin: 10,
+        elevation: 5,
+        shadowColor: '#2d2d2d',
+      },
+      buttonText: {
+        color: '#fff',
+        fontWeight: 'bold',
+        fontSize: 16,
       },
 });

@@ -20,6 +20,7 @@ export function initUserDB(user){
           ejerciciosCreados: [],
           ejerciciosEnCurso: [],
           ejerciciosTerminados: [],
+          ejerciciosTerminadosIds: [],
           ejerciciosIntentados: [],
           puntajeTotal: {
             ejerciciosDiarios: 0,
