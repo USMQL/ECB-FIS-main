@@ -9,10 +9,9 @@ import { descargarArchivo } from '../utils/firebaseUtils';
 import { Image } from 'expo-image';
 import LoadingScreen from './LoadingScreen';
 import { arrayUnion } from 'firebase/firestore';
-import { set } from 'firebase/database';
-
 
 export default function ExerciseScreen({ navigation, route }) {
+    const [isRefreshing, setIsRefreshing] = useState(false);
     const { ejercicioId, ejercicioData } = route.params;
     const [loadingUserData, setLoadingUserData] = useState(true);
     const user = auth.currentUser;
@@ -22,7 +21,7 @@ export default function ExerciseScreen({ navigation, route }) {
     const [resultadoModalVisible, setResultadoModalVisible] = useState(false);
     const [formulaVisible, setFormulaVisible] = useState(false);
     const [respuestaIngresada, setRespuestaIngresada] = useState(null);
-    const [puntajeObtenido, setPuntajeObtenido] = useState(ejercicioData.puntaje);
+    const [puntajeObtenido, setPuntajeObtenido] = useState(ejercicioData.puntaje? Math.abs(ejercicioData.puntaje) : 0);
     const [isRespuestaCorrecta, setIsRespuestaCorrecta] = useState(null);
     const [imagenEjercicio, setImagenEjercicio] = useState(null);
     const [imagenFormula, setImagenFormula] = useState(null);
@@ -69,13 +68,11 @@ export default function ExerciseScreen({ navigation, route }) {
         // Verificar si la respuesta ingresada es correcta.
         setIsRespuestaCorrecta((ejercicioData.respuesta === respuestaIngresada));
         setResultadoModalVisible(true);
-        console.log('Validando datos:', '"'+respuestaIngresada+'"', '"'+ejercicioData.respuesta+'"');
         if (!(ejercicioData.respuesta === respuestaIngresada)) {
-            if (puntajeObtenido > 0) setPuntajeObtenido(puntajeObtenido - 2);
+            if (puntajeObtenido > 0) setPuntajeObtenido(puntajeObtenido - (puntajeObtenido===1? 1 : 2));
             return;
         }
-        console.log('Respuesta correcta!');
-
+        setIsRefreshing(true);
         await updateUserDB(user, {
             "stats.ejerciciosTerminados": arrayUnion({
                 id: ejercicioId,
@@ -86,7 +83,7 @@ export default function ExerciseScreen({ navigation, route }) {
             "stats.ejerciciosTerminadosIds": arrayUnion(ejercicioId),
             "stats.puntajeTotal.ejerciciosGenerados": userDB.stats.puntajeTotal.ejerciciosGenerados + puntajeObtenido,
         });
-        await refreshUserDB(user, userDB);
+        setIsRefreshing(false);
         return;
     }
 
@@ -104,8 +101,11 @@ export default function ExerciseScreen({ navigation, route }) {
     }, []);
 
     function ResultadoModal() {
-        const handleCloseModal = () => {
+        const handleCloseModal = async () => {
             if (isRespuestaCorrecta) {
+                setIsRefreshing(true);
+                await refreshUserDB(user, userDB);
+                setIsRefreshing(false);
                 navigation.navigate("Home");
             } else {
                 setResultadoModalVisible(!resultadoModalVisible);
@@ -117,14 +117,14 @@ export default function ExerciseScreen({ navigation, route }) {
                     <View style={resultadoModal.modalView}>
                         <Text style={resultadoModal.modalText}>Resultado del ejercicio</Text>
                         {isRespuestaCorrecta? (
-                            <Text style={{marginBottom: 20}}></Text>
+                            <Text style={{marginBottom: 20, fontWeight: 'bold'}}>Excelente!</Text>
                         ) : (
                             <Text style={{marginBottom: 20, textAlign: 'center'}}>Vaya, respuesta incorrecta, intenta de nuevo.</Text>
                         )}
                         <Text style={{marginBottom: 20}}>Respuesta ingresada: {respuestaIngresada}</Text>
                         {isRespuestaCorrecta && <Text style={{marginBottom: 20}}>Puntaje obtenido: {puntajeObtenido}</Text>}
 
-                        <TouchableOpacity style={[resultadoModal.button]} onPress={handleCloseModal}>
+                        <TouchableOpacity style={[resultadoModal.button, isRefreshing && resultadoModal.buttonDisabled]} onPress={handleCloseModal} disabled={isRefreshing}>
                         {isRespuestaCorrecta? (
                             <Text style={resultadoModal.buttonText}>Cerrar</Text>
                         ) : (
@@ -143,8 +143,9 @@ export default function ExerciseScreen({ navigation, route }) {
                     <View style={stylesModal.modalView}>
                         <Text style={stylesModal.modalText}>Formula del ejercicio</Text>
                         {imagenFormula? <Image source={imagenFormula} style={{width: "100%", height: 200, marginBottom: 20}} contentFit='contain' /> : <Text style={{marginBottom: 20}}>No hay formula adjunta.</Text>}
+                        <Text style={{marginBottom: 20}}>"En la vida, como en física, cada acción tiene su ley, fórmulas de amor y esfuerzo, transforman sueños en fe"</Text>
                         <TouchableOpacity style={[stylesModal.button]} onPress={() => setFormulaVisible(!formulaVisible)}>
-                        <Text style={stylesModal.textStyle}>Ocultar</Text>
+                            <Text style={stylesModal.textStyle}>Ocultar</Text>
                         </TouchableOpacity>
                     </View>
                 </View>
@@ -372,5 +373,8 @@ const resultadoModal = StyleSheet.create({
         color: '#fff',
         fontWeight: 'bold',
         fontSize: 16,
+      },
+      buttonDisabled: {
+        backgroundColor: '#ccc',
       },
 });

@@ -21,5 +21,6 @@ export async function seleccionarEjercicioAleatorio(userData){
     } catch(error){
         console.error("Error al intentar obtener la colección de ejercicios", error);
         Alert.alert("Ups!", "Ha ocurrido un error al intentar obtener la colección de ejercicios");
+        return null;
     }
 }
