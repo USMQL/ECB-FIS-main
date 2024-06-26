@@ -4,14 +4,14 @@ import { subscribeUserDB, refreshUserDB, updateUserDB } from '../utils/initUser'
 import { useEffect, useState } from 'react';
 import { actualizarDocumento , agregarDocumento, obtenerDocumento } from '../utils/firebaseUtils';
 import LoadingScreen from './LoadingScreen';
-
+import { SignOutButton } from'../components/SignOutButton';
 
 export default function ProfileScreen({ navigation }) {
     const [loadingScreen, setLoadingScreen] = useState(true);
     const [loadingSubmit, setLoadingSubmit] = useState(false);
     const user = auth.currentUser;
     const [userDB, setUserDB] = useState(null);
-
+    
     const [variable, setVariable] = useState({
         parametro: variable,
     });
@@ -65,19 +65,22 @@ export default function ProfileScreen({ navigation }) {
     return (
 
         
-        <View>
+        <View style={{backgroundColor:'white'}}>
+            
             <ScrollView>
+             
             {/* mostrar el nombre */}
             <Text style={{margin: 20}}>Nombre de usuario:  <Text style={{fontWeight: 'bold'}}>{userDB.displayName}</Text></Text>
-            {/* escribir el nombre */}
+           
+            {/* */}
+            <Text style={{margin: 20}}>Tu biografia: <Text style={{fontWeight: 'bold'}}>{userDB.bio}</Text></Text>
+             {/* escribir el nombre */}
             <TextInput
                 style={styles.inputNombre}
                 placeholder="Cambiar nombre de usuario"
                 value={variable.displayName}
                 onChangeText={text => handleInputChange('displayName',text) }
             />
-            {/* */}
-            <Text style={{margin: 20}}>Tu biografia: <Text style={{fontWeight: 'bold'}}>{userDB.bio}</Text>!</Text>
             {/* escribir la biografia */}
             <TextInput
                 style={styles.inputBio}
@@ -93,9 +96,10 @@ export default function ProfileScreen({ navigation }) {
 
 
 
-
+            
             </ScrollView>
-        </View>
+            
+        </View > 
         
     );
 }
@@ -109,6 +113,7 @@ const styles = StyleSheet.create({
         borderRadius: 4,
         elevation: 3,
         backgroundColor: 'black',
+        
       },
       text: {
         fontSize: 16,
@@ -116,6 +121,7 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         letterSpacing: 0.25,
         color: 'white',
+        backgroundColor: 'white'
       },
       inputBio: {
         height: 80,
@@ -128,6 +134,7 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         textAlignVertical: 'top',
         textAlign: 'left',
+        backgroundColor: 'white'
     },
     inputNombre: {
         height: 40,
@@ -140,6 +147,7 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         textAlignVertical: 'top',
         textAlign: 'left',
+        backgroundColor: 'white'
     },
 
 
