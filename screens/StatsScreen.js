@@ -12,14 +12,8 @@ import { useCallback, useEffect, useState } from "react";
 import { auth } from "../firebase-config";
 import { subscribeUserDB, refreshUserDB } from "../utils/initUser";
 import { exitApp } from "../utils/backAction";
-import {
-  BarChart,
-} from "react-native-chart-kit";
-import {
-  Table,
-  TableWrapper,
-  Rows,
-} from "react-native-table-component";
+import { BarChart } from "react-native-chart-kit";
+import { Table, TableWrapper } from "react-native-table-component";
 
 import LoadingScreen from "./LoadingScreen";
 import { GlobalStats } from "../utils/statsGlobales";
@@ -34,11 +28,11 @@ export default function StatsScreen({ navigation }) {
   // por cierto al actualizar se coloca como que users es null
   const handleRefreshUsers = async (data) => {
     await setUsers(data);
+    setLoadingUserData(false);
   };
 
   const handleRefreshUserDBStats = async (data) => {
     await setUserDB(data);
-    setLoadingUserData(false);
   };
   useEffect(() => {
     const upUserDB = async () => {
@@ -75,28 +69,31 @@ export default function StatsScreen({ navigation }) {
     if (!topPuntajes) {
       return null;
     }
+    const userName = userDB.displayName;
 
     topPuntajes.sort((a, b) => b[1] - a[1]);
 
-    const userIndex = topPuntajes.findIndex(
-      (user) => user[0] === auth.currentUser.displayName
-    );
-    const userPuntaje = userIndex !== -1 ? topPuntajes[userIndex] : null;
+    const dataUser = topPuntajes.find((user) => user[0] === userName);
+
+    const userIndex = topPuntajes.findIndex((user) => user[0] === userName) + 1;
 
     let top5Puntajes = topPuntajes.slice(0, 5);
 
-    if (userPuntaje && userIndex >= 5) {
-      top5Puntajes.push([userIndex + 1, userPuntaje[0], userPuntaje[1]]);
+    if (userIndex > 5) {
+      top5Puntajes.push([userIndex, dataUser[0], dataUser[1]]);
     }
 
     top5Puntajes = top5Puntajes.map((user, index) => {
-      const position =
-        userIndex >= 5 && user[0] === auth.currentUser.displayName
-          ? userIndex + 1
-          : index + 1;
-      return [position, user[0], user[1]];
+      if (user[1] === dataUser[0]) {
+        return [userIndex, dataUser[0], dataUser[1]];
+      } else {
+        return [
+          userIndex >= 5 && user[0] === userName ? userIndex + 1 : index + 1,
+          user[0],
+          user[1],
+        ];
+      }
     });
-
     const fueradetop = top5Puntajes.slice(3);
 
     return (
@@ -137,13 +134,46 @@ export default function StatsScreen({ navigation }) {
               width: screenWidth - 20,
             }}
           >
-            <TableWrapper style={{ flexDirection: "row" }}>
-              <Rows
-                data={fueradetop.map((row) => row.slice(0))}
-                flexArr={[1, 2, 1]}
-                textStyle={{ color: `rgba(255, 255, 255,1)` }}
-                style={{ backgroundColor: "#63cbfa" }}
-              />
+            <TableWrapper style={{ backgroundColor: "#fffff" }}>
+              {fueradetop.map((rowData, index) => (
+                <View
+                  key={index}
+                  style={{
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    padding: 10,
+                  }}
+                >
+                  <Text
+                    style={{
+                      textAlign: "left",
+                      flex: 1,
+                      color: "#ffff"
+                    }}
+                  >
+                    {rowData[0]}
+                  </Text>
+                  <Text
+                    style={{
+                      textAlign: "center",
+                      flex: 1,
+                      color: "#ffff"
+                    }}
+                  >
+                    {rowData[1]}
+                  </Text>
+                  <Text
+                    style={{
+                      textAlign: "right",
+                      flex: 1,
+                      color: "#ffff"
+                    }}
+                  >
+                    {rowData[2]}
+                  </Text>
+                </View>
+              ))}
             </TableWrapper>
           </Table>
         </View>
@@ -153,6 +183,9 @@ export default function StatsScreen({ navigation }) {
 
   const GraficoPuntaje = () => {
     // grafico de barras de informacion sobre el puntaje diario y el total
+    if (!userDB) {
+      return null;
+    }
     const puntajeTotal = userDB.stats.puntajeTotal;
     return (
       <BarChart
@@ -191,6 +224,9 @@ export default function StatsScreen({ navigation }) {
 
   const GraficoRachas = () => {
     // grafico de barras de informacion de las rachas diarias y totales
+    if (!userDB) {
+      return null;
+    }
     const rachaEjerciciosDiarios = userDB.stats.rachaEjerciciosDiarios;
     const rachaEjerciciosGenerados = userDB.stats.rachaEjerciciosGenerados;
 
@@ -228,6 +264,9 @@ export default function StatsScreen({ navigation }) {
 
   const InfoGeneral = () => {
     // grafico de barras de informacion general de las estadisticas totales
+    if (!userDB) {
+      return null;
+    }
     const creados = userDB.stats.ejerciciosCreados.length;
     const enCurso = userDB.stats.ejerciciosEnCurso.length;
     const intentados = userDB.stats.ejerciciosIntentados.length;
