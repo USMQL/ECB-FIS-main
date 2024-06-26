@@ -47,7 +47,7 @@ export default function ExerciseScreen({ navigation, route }) {
 
     useEffect(() => {
         if (ejercicioData.titulo) {
-            navigation.setOptions({ title: ejercicioData.materia });
+            navigation.setOptions({ title: ejercicioData.titulo });
         }
         navigation.setOptions({
             headerLeft: () => <GoBackButton navigation={navigation} />,

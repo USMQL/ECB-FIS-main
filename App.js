@@ -17,6 +17,7 @@ import ExerciseScreen from './screens/ExerciseScreen';
 // Componentes.
 import SignOutButton from './components/SignOutButton';
 import RecPasswordScreen from './screens/RecPasswordScreen';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -76,10 +77,16 @@ export default function App() {
         <Tab.Screen name="Home" component={HomeScreen} options={{
           title: 'Inicio',
           headerLeft: () => (<SignOutButton/>),
+          tabBarIcon: ({focused, color, size}) => (
+            <MaterialCommunityIcons name="home" color={color} size={30}/>
+          ),
         }}/>
         {userdb?.isProfesor ? (
         <Tab.Screen name="Upload" component={UploadScreen} options={{
           title: 'Subir Ejercicio',
+          tabBarIcon: ({focused, color, size}) => (
+            <MaterialCommunityIcons name="upload" color={color} size={30}/>
+          ),
         }}/>
         ):(null)}
         <Tab.Screen name="Exercise" component={ExerciseScreen} options={{
@@ -101,9 +108,10 @@ const tabNavigatorScreenOptions = {
     // position: 'absolute',
     height: 80,
     paddingBottom: 10,
+    paddingTop: 10,
   },
   tabBarLabelStyle: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: 'bold',
   },
   
