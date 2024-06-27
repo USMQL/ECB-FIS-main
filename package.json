@@ -24,7 +24,8 @@
     "expo-image-picker": "~15.0.5",
     "@react-native-picker/picker": "2.7.5",
     "expo-checkbox": "~3.0.0",
-    "expo-image": "~1.12.12"
+    "expo-image": "~1.12.12",
+    "expo-linear-gradient": "~13.0.2"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0"

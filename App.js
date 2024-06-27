@@ -18,6 +18,8 @@ import ExerciseScreen from './screens/ExerciseScreen';
 import SignOutButton from './components/SignOutButton';
 import RecPasswordScreen from './screens/RecPasswordScreen';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import Saludo from './components/Saludo';
+import ProfileHomeButton from './components/ProfileHomeButton';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -76,7 +78,10 @@ export default function App() {
       <Tab.Navigator initialRouteName={'Home'} screenOptions={tabNavigatorScreenOptions}>
         <Tab.Screen name="Home" component={HomeScreen} options={{
           title: 'Inicio',
-          headerLeft: () => (<SignOutButton/>),
+          headerTitle: (props) => (<Saludo/>),
+          headerRight: (props) => (<ProfileHomeButton userData={userdb}/>),
+          headerTitleAlign: 'left',
+          headerTransparent: true,
           tabBarIcon: ({focused, color, size}) => (
             <MaterialCommunityIcons name="home" color={color} size={30}/>
           ),
@@ -109,6 +114,7 @@ const tabNavigatorScreenOptions = {
     height: 80,
     paddingBottom: 10,
     paddingTop: 10,
+    elevation: 0,
   },
   tabBarLabelStyle: {
     fontSize: 14,
