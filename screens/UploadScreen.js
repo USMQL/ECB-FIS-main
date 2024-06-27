@@ -1,5 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
-import { Image, View, StyleSheet, TouchableOpacity, TextInput, ScrollView, Text, Alert } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, TextInput, ScrollView, Text, Alert } from 'react-native';
+import { Image } from 'expo-image';
 import { useState } from 'react';
 
 import { auth } from '../firebase-config';
@@ -50,15 +51,35 @@ export default function UploadScreen() {
         setFormData({ ...formData, [name]: value });
     };
     // Enviar el formulario a la base de datos.
-    const handleSubmit = async () => {
+    const handleSubmit = () => {
+        Alert.alert("Enviar", "¿Está segur@ que desea enviar los datos ingresados?", [
+            { text: "Cancelar", style: "cancel", onPress: () => null },
+            { text: "Confirmar", onPress: () => (handleEnviarDatos()) },
+        ]);
+    };
+    const handleEnviarDatos = async () => {
         try{
             setLoading(true);
+            const requiredFields = ['contenido', 'respuesta', 'dificultad', 'puntaje', 'tipoEjercicio'];
+            for (const field of requiredFields){
+                if (!formData[field]){
+                    Alert.alert("Campos requeridos", `El campo ${field} es requerido.`);
+                    setLoading(false);
+                    return;
+                }
+            }
+            const respuestas = formData.respuestas.split(',').map(r => r.trim());
+            if (respuestas.length > 1 && !respuestas.includes(formData.respuesta)){
+                Alert.alert("Respuesta no encontrada", "La respuesta correcta no se encuentra en las respuestas ingresadas.");
+                setLoading(false);
+                return;
+            }
             const imagenRef = await subirArchivo(ejercicioImg, 'ejercicios');
             const formulaRef = await subirArchivo(formulaImg, 'ejercicios-formulas');
             
             const exerciseData = {
                 ...formData,
-                respuestas: formData.respuestas.split(',').map(r => r.trim()), // Convertir la cadena de respuestas en un array.
+                respuestas: respuestas, // Convertir la cadena de respuestas en un array.
                 puntaje: parseInt(formData.puntaje, 10),
                 tiempo: parseInt(formData.tiempo, 10),
                 publicadoPor: auth.currentUser.uid,
@@ -77,7 +98,8 @@ export default function UploadScreen() {
     };
 
     return (
-        <ScrollView style={styles.container}>
+        <View style={{flex: 1, backgroundColor: '#fff'}}>
+        <ScrollView contentContainerStyle={styles.container}>
             <Text style={styles.label}>Título (opcional)</Text>
             <TextInput
                 style={styles.input}
@@ -91,7 +113,6 @@ export default function UploadScreen() {
                 placeholder="de que trata el ejercicio"
                 value={formData.descripcion}
                 onChangeText={text => handleInputChange('descripcion', text)}
-                multiline={true}
             />
             <Text style={styles.label}>Materia</Text>
             <TextInput
@@ -102,10 +123,11 @@ export default function UploadScreen() {
             />
             <Text style={styles.label}>Contenido</Text>
             <TextInput
-                style={styles.input}
+                style={[styles.input, styles.inputLarge]}
                 placeholder="Texto del ejercicio"
                 value={formData.contenido}
                 onChangeText={text => handleInputChange('contenido', text)}
+                multiline={true}
             />
             <View style={styles.row}>
                 <View style={{marginRight: 40}}>
@@ -114,7 +136,7 @@ export default function UploadScreen() {
                         <Text style={{color: 'white', fontWeight: 'bold'}}>Subir imagen</Text>
                     </TouchableOpacity>
                 </View>
-                {ejercicioImg && <Image source={{ uri: ejercicioImg }} style={styles.image} />}
+                {ejercicioImg && <Image source={ejercicioImg} style={styles.image} contentFit='contain' />}
             </View>
             <View style={styles.row}>
                 <View style={{marginRight: 40}}>
@@ -123,7 +145,7 @@ export default function UploadScreen() {
                         <Text style={{color: 'white', fontWeight: 'bold'}}>Subir imagen</Text>
                     </TouchableOpacity>
                 </View>
-                {formulaImg && <Image source={{ uri: formulaImg }} style={styles.image} />}
+                {formulaImg && <Image source={formulaImg} style={styles.image} contentFit='contain' />}
             </View>
             <Text style={styles.label}>Respuesta</Text>
             <TextInput
@@ -135,11 +157,21 @@ export default function UploadScreen() {
             <Text style={styles.label}>Respuestas (opcional)</Text>
             <Text style={{color: '#aaa'}}>En caso de ser un ejercicio de alternativas, ingrese sus respuestas (tambien debe ingresar la respuesta correcta y debe coincidir con el de arriba).</Text>
             <TextInput
-                style={styles.input}
+                style={[styles.input, styles.inputLarge]}
                 placeholder="Posibles respuestas (separadas por coma)"
                 value={formData.respuestas}
                 onChangeText={text => handleInputChange('respuestas', text)}
+                multiline={true}
             />
+            {!(formData.respuestas === "") && (
+                <View style={[styles.respuestasContainer]}>
+                    {formData.respuestas.split(',').map(r => r.trim()).map((respuesta, index) => (
+                        <TouchableOpacity style={[styles.respuestaItem]} key={index}>
+                            <Text style={[styles.respuestaItemText]}>{respuesta}</Text>
+                        </TouchableOpacity>
+                    ))}
+                </View>
+            )}
             <Text style={styles.label}>Dificultad</Text>
             <View style={styles.pickerContainer}>
                 <Picker
@@ -152,12 +184,14 @@ export default function UploadScreen() {
                     <Picker.Item label="Difícil" value="Difícil" />
                 </Picker>
             </View>
+            <Text style={{marginBottom: 20, marginTop: -20, textAlign: 'center'}}>Seleccionado: {formData.dificultad}</Text>
             <Text style={styles.label}>Puntaje (número entero)</Text>
             <TextInput
                 style={styles.input}
                 placeholder="Puntaje"
                 value={formData.puntaje.toString()}
                 keyboardType="numeric"
+                inputMode='numeric'
                 onChangeText={text => handleInputChange('puntaje', text)}
             />
             <Text style={styles.label}>Tipo de Ejercicio</Text>
@@ -171,30 +205,31 @@ export default function UploadScreen() {
                     <Picker.Item label="Normal" value="Normal" />
                 </Picker>
             </View>
+            <Text style={{marginBottom: 20, marginTop: -20, textAlign: 'center'}}>Seleccionado: {formData.tipoEjercicio}</Text>
             <Text style={styles.label}>Tiempo (en segundos) (opcional)</Text>
             <TextInput
                 style={styles.input}
                 placeholder="Tiempo (en segundos)"
                 value={formData.tiempo.toString()}
                 keyboardType="numeric"
+                inputMode='numeric'
                 onChangeText={text => handleInputChange('tiempo', text)}
             />
             <Text style={styles.label}>Retroalimentación (opcional)</Text>
             <TextInput
-                style={styles.input}
+                style={[styles.input, styles.inputLarge]}
                 placeholder="Retroalimentación del ejercicio"
                 value={formData.retroalimentacion}
                 onChangeText={text => handleInputChange('retroalimentacion', text)}
+                multiline={true}
             />
-            <TouchableOpacity onPress={handleSubmit} style={[!loading ? (styles.button):(styles.buttonDisabled), {width: '100%'}]} disabled={loading}>
+            <TouchableOpacity onPress={handleSubmit} style={[[styles.button, loading && styles.buttonDisabled, {width: '100%'}]]} disabled={loading}>
                 <Text style={{color: 'white', fontWeight: 'bold'}}>{!loading ? ('Enviar a la base de datos'):('Enviando...') }</Text>
             </TouchableOpacity>
-            <Text>
-                {JSON.stringify(formData, null, 2)}
-            </Text>
             
-            <StatusBar style="auto" />
         </ScrollView>
+        <StatusBar style="auto" />
+        </View>
     );
 }
 
@@ -202,10 +237,10 @@ const styles = StyleSheet.create({
     container: {
         backgroundColor: '#fff',
         paddingHorizontal: 20,
+        paddingBottom: 60,
     },
     row: {
         flexDirection: 'row',
-        // alignItems: 'center',
     },
     image: {
         width: 100,
@@ -217,7 +252,7 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
     },
     input: {
-        height: 80,
+        height: 40,
         width: '100%',
         padding: 10,
         marginTop: 5,
@@ -227,6 +262,9 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         textAlignVertical: 'top',
         textAlign: 'left',
+    },
+    inputLarge: {
+        height: 80,
     },
     pickerContainer: {
         height: 40,
@@ -255,13 +293,23 @@ const styles = StyleSheet.create({
         marginTop: 5,
     },
     buttonDisabled: {
-        height: 40,
-        width: 150,
-        padding: 10,
         backgroundColor: '#aaa',
-        borderRadius: 10,
-        alignItems: 'center',
-        marginBottom: 20,
-        marginTop: 5,
     },
+    respuestasContainer: {
+        flex: 1,
+        marginBottom: 20,
+        borderWidth: 1,
+        borderRadius: 10,
+        borderColor: '#E0E0E0',
+    },
+    respuestaItem: {
+        backgroundColor: '#eee',
+        padding: 10,
+        margin: 5,
+        borderRadius: 10,
+    },
+    respuestaItemText: {
+        color: '#000',
+    },
+
 });

@@ -13,9 +13,14 @@ import LoginScreen from './screens/LoginScreen';
 import HomeScreen from './screens/HomeScreen';
 import UploadScreen from './screens/UploadScreen';
 import ProfileScreen from './screens/ProfileScreen';
+import ExerciseScreen from './screens/ExerciseScreen';
 
 // Componentes.
 import SignOutButton from './components/SignOutButton';
+import RecPasswordScreen from './screens/RecPasswordScreen';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import Saludo from './components/Saludo';
+import ProfileHomeButton from './components/ProfileHomeButton';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -24,32 +29,33 @@ export default function App() {
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
   const [userdb, setUserdb] = useState(null);
-  let unsubscribeUserDB = null;
+  let unsubscribeUserDB = () => (null);
 
   const handleRefreshUserDBApp = async (data) => {
     await setUserdb(data);
   }
+  useEffect(() => {
+    const suscribirCambiosUserDB = async () => {
+      unsubscribeUserDB = await subscribeUserDB(handleRefreshUserDBApp);
+    }
+    suscribirCambiosUserDB();
+    return () => (unsubscribeUserDB());
+  });
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (user) => {
       setUser(user);
       if (user){
-        await unsubscribeUserDB;
-        unsubscribeUserDB = await subscribeUserDB(handleRefreshUserDBApp);
         await refreshUserDB(user);
       }
       setLoading(false);
     });
-    return () => {
-      unsubscribeUserDB();
-      unsubscribe();
-    };
+    return () => (unsubscribe());
   }, []);
 
   if (loading) {
     return (<LoadingScreen/>);
   }
-  
   return (
     <NavigationContainer>
       {!user? (
@@ -59,59 +65,81 @@ export default function App() {
             title: '',
             headerTransparent: true,
           }}/>
+          <Stack.Screen name="RecuperarContrasena" component={RecPasswordScreen} options={{
+            title: '',
+            headerTransparent: true,
+            headerTitleAlign: 'center',
+            headerBackTitle: "Volver",
+            headerBackTitleVisible: true,
+            headerBackTitleStyle: {fontWeight: 'bold'},
+          }}/>
         </Stack.Navigator>
         
       ) : (
         // El usuario se encuentra logeado.
-        <Tab.Navigator initialRouteName={'Home'} screenOptions={tabNavigatorScreenOptions}>
-          <Tab.Screen name="Home" component={HomeScreen} options={{
-            title: 'Inicio',
-            // headerTransparent: true,
-            headerStyle: {
-              backgroundColor: '#fff',
-              elevation: 0,
-              shadowOpacity: 0,
-              borderBottomWidth: 0,
-            },
-            headerTitleAlign: 'center',
-            headerTintColor: '#000',
-            headerTitleStyle: {
-              fontWeight: 'bold',
-            },
-            headerLeft: () => (<SignOutButton/>),
-          }}/>
-           <Tab.Screen name="Perfil" component={ProfileScreen} />
-          {userdb?.isProfesor ? (
-          <Tab.Screen name="Upload" component={UploadScreen} options={{
-            title: 'Subir Ejercicio',
-            // headerTransparent: true,
-            headerStyle: {
-              backgroundColor: '#fff',
-              elevation: 0,
-              shadowOpacity: 0,
-              borderBottomWidth: 0,
-            },
-            headerTitleAlign: 'center',
-            headerTintColor: '#000',
-            headerTitleStyle: {
-              fontWeight: 'bold',
-            },
-          }}/>
-          ):(null)}
-        </Tab.Navigator>
+      <Tab.Navigator initialRouteName={'Home'} screenOptions={tabNavigatorScreenOptions}>
+        <Tab.Screen name="Home" component={HomeScreen} options={{
+          title: 'Inicio',
+          headerTitle: (props) => (<Saludo/>),
+          headerRight: (props) => (<ProfileHomeButton userData={userdb}/>),
+          headerTitleAlign: 'left',
+          headerTransparent: true,
+          tabBarIcon: ({focused, color, size}) => (
+            <MaterialCommunityIcons name="home" color={color} size={30}/>
+          ),
+        }}/>
+        <Tab.Screen name="Perfil" component={ProfileScreen} options={{
+          title: 'Perfil',
+          tabBarIcon: ({focused, color, size}) => (
+            <MaterialCommunityIcons name="account" color={color} size={30}/>
+          ),
+        }}/>
+        {userdb?.isProfesor ? (
+        <Tab.Screen name="Upload" component={UploadScreen} options={{
+          title: 'Subir Ejercicio',
+          tabBarIcon: ({focused, color, size}) => (
+            <MaterialCommunityIcons name="upload" color={color} size={30}/>
+          ),
+        }}/>
+        ):(null)}
+        <Tab.Screen name="Exercise" component={ExerciseScreen} options={{
+          title: 'Ejercicio',
+          tabBarStyle: {display: 'none'},
+          tabBarItemStyle: {display: 'none'},
+          unmountOnBlur: true,
+          
+        }}/>
+      </Tab.Navigator>
       )}
     </NavigationContainer>
   );
 }
 
 const tabNavigatorScreenOptions = {
+  // --- TabBar ---
   tabBarStyle: {
     // position: 'absolute',
     height: 80,
     paddingBottom: 10,
+    paddingTop: 10,
+    elevation: 0,
   },
   tabBarLabelStyle: {
-    fontSize: 16,
+    fontSize: 14,
+    fontWeight: 'bold',
+  },
+  
+  // --- Header ---
+  // headerTransparent: true,
+  headerStyle: {
+    backgroundColor: '#fff',
+    elevation: 0,
+    shadowOpacity: 0,
+    borderBottomWidth: 0,
+  },
+  headerTitleAlign: 'center',
+  headerTintColor: '#000',
+  headerTitleStyle: {
     fontWeight: 'bold',
   },
 }

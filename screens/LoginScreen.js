@@ -89,6 +89,17 @@ export default function Login({ navigation }) {
         secureTextEntry
       />
 
+      <View style={{flexDirection: 'row', width: '100%', marginBottom: 20, justifyContent: 'space-evenly'}}>
+        <Text style={[styles.message]}>
+          ¿Olvidaste tu contraseña?
+        </Text>
+        <TouchableOpacity onPress={() => navigation.navigate("RecuperarContrasena")}>
+          <Text style={[styles.messageBlack, {fontSize: 12}]}>
+            Recuperar contraseña
+          </Text>
+        </TouchableOpacity>
+      </View>
+
       <View style={styles.checkboxContainer}>
         <Checkbox value={rememberMe} onValueChange={setRememberMe} />
         <Text style={styles.checkboxLabel}>Mantener sesión abierta</Text>
@@ -118,6 +129,7 @@ export default function Login({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    paddingHorizontal: 30,
     backgroundColor: "#fff",
     alignItems: "center",
     justifyContent: "center",
@@ -151,7 +163,7 @@ const styles = StyleSheet.create({
   message: {
     color: "#828282",
     fontSize: 12,
-    width: 325,
+    // width: 325,
     textAlign: "center",
   },
   messageBlack: {
