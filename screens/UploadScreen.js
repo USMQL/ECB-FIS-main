@@ -227,8 +227,8 @@ export default function UploadScreen() {
                 <Text style={{color: 'white', fontWeight: 'bold'}}>{!loading ? ('Enviar a la base de datos'):('Enviando...') }</Text>
             </TouchableOpacity>
             
-            <StatusBar style="auto" />
         </ScrollView>
+        <StatusBar style="auto" />
         </View>
     );
 }

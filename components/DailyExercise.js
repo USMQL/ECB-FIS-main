@@ -4,11 +4,12 @@ import Constants from 'expo-constants';
 import { useState } from 'react';
 import { obtenerDocumento } from '../utils/firebaseUtils';
 
-export default function DailyExercise({ navigation, ejercicioDiario }) {
+export default function DailyExercise({ navigation, ejercicioDiario, functionOnButtonDisabled }) {
     const [exerciseButtonDisabled, setExerciseButtonDisabled] = useState(false);
     
     const handleGoEjercicioDiario = async () => {
         setExerciseButtonDisabled(true);
+        if (functionOnButtonDisabled) functionOnButtonDisabled(true);
         await obtenerDocumento("ejercicios", ejercicioDiario).then((doc) => {
             navigation.navigate("Exercise", {
                 ejercicioId: doc.id,
@@ -16,8 +17,10 @@ export default function DailyExercise({ navigation, ejercicioDiario }) {
             });
         }).catch((error) => {
             Alert.alert("Ups!", "No se pudo obtener los datos del ejercicio diario. Intente de nuevo más tarde.");
+            if (functionOnButtonDisabled) functionOnButtonDisabled(false);
             setExerciseButtonDisabled(false);
         });
+        if (functionOnButtonDisabled) functionOnButtonDisabled(false);
         setExerciseButtonDisabled(false);
     }
     return (
@@ -34,9 +37,8 @@ export default function DailyExercise({ navigation, ejercicioDiario }) {
 
 const styles = StyleSheet.create({
     background: {
-        // flex: 1,
         width: '100%',
-        height: Constants.statusBarHeight + 56 + 180,
+        height: Constants.statusBarHeight + 56 + 140,
         paddingTop: Constants.statusBarHeight + 56,
         shadowColor: '#000',
         shadowOffset: {

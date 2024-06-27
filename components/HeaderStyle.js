@@ -12,5 +12,6 @@ const styles = StyleSheet.create({
     container: {
         width: '100%',
         height: Constants.statusBarHeight + 56,
+        zIndex: 10,
     },
 });

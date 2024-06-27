@@ -79,7 +79,7 @@ export default function App() {
         <Tab.Screen name="Home" component={HomeScreen} options={{
           title: 'Inicio',
           headerTitle: (props) => (<Saludo/>),
-          headerRight: (props) => (<ProfileHomeButton/>),
+          headerRight: (props) => (<ProfileHomeButton userData={userdb}/>),
           headerTitleAlign: 'left',
           headerTransparent: true,
           tabBarIcon: ({focused, color, size}) => (

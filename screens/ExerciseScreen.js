@@ -1,14 +1,15 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, BackHandler, Text, View, Modal, TouchableOpacity, ScrollView, TextInput, Alert } from 'react-native';
+import { Image } from 'expo-image';
 import { useEffect, useState } from 'react';
+import { arrayUnion } from 'firebase/firestore';
+
 import { auth } from '../firebase-config'
 import { subscribeUserDB, refreshUserDB, updateUserDB } from '../utils/initUser';
 import { confirmBackAction } from '../utils/backAction'
-import GoBackButton from '../components/GoBackButton';
 import { descargarArchivo } from '../utils/firebaseUtils';
-import { Image } from 'expo-image';
+import GoBackButton from '../components/GoBackButton';
 import LoadingScreen from './LoadingScreen';
-import { arrayUnion } from 'firebase/firestore';
 
 export default function ExerciseScreen({ navigation, route }) {
     const [isRefreshing, setIsRefreshing] = useState(false);
@@ -67,21 +68,24 @@ export default function ExerciseScreen({ navigation, route }) {
         }
         // Verificar si la respuesta ingresada es correcta.
         setIsRespuestaCorrecta((ejercicioData.respuesta === respuestaIngresada));
-        setResultadoModalVisible(true);
         if (!(ejercicioData.respuesta === respuestaIngresada)) {
             if (puntajeObtenido > 0) setPuntajeObtenido(puntajeObtenido - (puntajeObtenido===1? 1 : 2));
+            setResultadoModalVisible(true);
             return;
         }
         setIsRefreshing(true);
+        setResultadoModalVisible(true);
         await updateUserDB(user, {
             "stats.ejerciciosTerminados": arrayUnion({
                 id: ejercicioId,
+                tipoEjercicio: ejercicioData.tipoEjercicio,
                 respuestaIngresada: respuestaIngresada,
                 isRespuestaCorrecta: isRespuestaCorrecta,
                 puntajeObtenido: puntajeObtenido,
             }),
             "stats.ejerciciosTerminadosIds": arrayUnion(ejercicioId),
-            "stats.puntajeTotal.ejerciciosGenerados": userDB.stats.puntajeTotal.ejerciciosGenerados + puntajeObtenido,
+            "stats.puntajeTotal.ejerciciosGenerados": ejercicioData.tipoEjercicio === "Normal"? (userDB.stats.puntajeTotal.ejerciciosGenerados + puntajeObtenido) : 0,
+            "stats.puntajeTotal.ejerciciosDiarios": ejercicioData.tipoEjercicio === "Diario"? (userDB.stats.puntajeTotal.ejerciciosDiarios + puntajeObtenido) : 0,
         });
         setIsRefreshing(false);
         return;

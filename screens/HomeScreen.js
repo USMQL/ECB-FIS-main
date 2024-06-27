@@ -1,5 +1,4 @@
 import { StatusBar } from 'expo-status-bar';
-import Constants from 'expo-constants';
 import { StyleSheet, BackHandler, Text, View, TouchableOpacity, RefreshControl, ScrollView } from 'react-native';
 import { useCallback, useEffect, useState } from 'react';
 import { auth } from '../firebase-config'
@@ -10,7 +9,6 @@ import LoadingScreen from './LoadingScreen';
 import DailyExercise from '../components/DailyExercise';
 import HeaderStyle from '../components/HeaderStyle';
 import { obtenerDocumento } from '../utils/firebaseUtils';
-import { set } from 'firebase/database';
 
 export default function HomeScreen({ navigation }) {
     const [loadingUserData, setLoadingUserData] = useState(true);
@@ -83,8 +81,8 @@ export default function HomeScreen({ navigation }) {
             {userDB.stats.ejerciciosTerminadosIds.includes(ejercicioDiario)? (
                 <HeaderStyle/>
             ):(
-                <View style={{flex: 1, width: '100%'}}>
-                    <DailyExercise navigation={navigation} ejercicioDiario={ejercicioDiario} />
+                <View style={{width: '100%', zIndex: 10}}>
+                    <DailyExercise navigation={navigation} ejercicioDiario={ejercicioDiario} functionOnButtonDisabled={setExerciseButtonDisabled} />
                 </View>
             )}
             <ScrollView contentContainerStyle={styles.scrollContainer} refreshControl={
@@ -94,7 +92,7 @@ export default function HomeScreen({ navigation }) {
                     <Text style={styles.title}>ECB-FIS</Text>
                     <Text style={{margin: 20}}>Bienvenido <Text style={{fontWeight: 'bold'}}>{userDB.displayName}</Text>!</Text>
                     
-                    <TouchableOpacity style={[!generarEjercicioButtonDisabled? styles.button : styles.buttonDisabled, {marginTop: 60}]} onPress={handleGenerarEjercicio} disabled={generarEjercicioButtonDisabled}>
+                    <TouchableOpacity style={[styles.button, generarEjercicioButtonDisabled && styles.buttonDisabled, {marginTop: 60}]} onPress={handleGenerarEjercicio} disabled={generarEjercicioButtonDisabled || exerciseButtonDisabled}>
                         <Text style={{color: 'white', fontWeight: 'bold'}}>{!generarEjercicioButtonDisabled? "Generar Ejercicio":"Generando..."}</Text>
                     </TouchableOpacity>
                     {userDB?.isProfesor && (
@@ -103,8 +101,8 @@ export default function HomeScreen({ navigation }) {
                     </TouchableOpacity>
                     )}
                 </View>
-            <StatusBar style="light" />
             </ScrollView>
+            <StatusBar style="light" />
         </View>
     );
 }
@@ -137,12 +135,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     buttonDisabled: {
-        height: 40,
-        width: 300,
-        padding: 10,
         backgroundColor: '#aaa',
-        marginTop: 60,
-        borderRadius: 10,
-        alignItems: 'center',
     },
 });
