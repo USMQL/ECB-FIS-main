@@ -153,10 +153,14 @@ export default function ExerciseScreen({ navigation, route }) {
         );
     }
     if (loadingUserData) {
-        return (<LoadingScreen/>);
+        return (
+        <View style={styles.background}>
+            <LoadingScreen/>
+        </View>
+        );
     }
     return (
-        <View style={{flex: 1, backgroundColor: '#fff'}}>
+        <View style={styles.background}>
             <ScrollView contentContainerStyle={styles.container}>
             <Text style={styles.description}>{ejercicioData.contenido}</Text>
 
@@ -208,6 +212,10 @@ export default function ExerciseScreen({ navigation, route }) {
 }
 
 const styles = StyleSheet.create({
+    background: {
+        flex: 1,
+        backgroundColor: '#fff',
+    },
     container: {
         backgroundColor: '#fff',
         alignItems: 'center',
