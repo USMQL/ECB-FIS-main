@@ -4,7 +4,9 @@ import { subscribeUserDB, refreshUserDB, updateUserDB } from '../utils/initUser'
 import { useEffect, useState } from 'react';
 import { actualizarDocumento , agregarDocumento, obtenerDocumento } from '../utils/firebaseUtils';
 import LoadingScreen from './LoadingScreen';
-import { SignOutButton } from'../components/SignOutButton';
+import SignOutButton from'../components/SignOutButton';
+
+
 
 export default function ProfileScreen({ navigation }) {
     const [loadingScreen, setLoadingScreen] = useState(true);
@@ -15,7 +17,6 @@ export default function ProfileScreen({ navigation }) {
     const [variable, setVariable] = useState({
         parametro: variable,
     });
-
 
     const handleUpdateUserDB = async () => {
         await updateUserDB(user);
@@ -41,6 +42,8 @@ export default function ProfileScreen({ navigation }) {
         upUserDB();
         return () => unsubscribeUserDB();
     }, [user]);
+
+    
 
     // Enviar los datos a la base de datos.
     const handleSubmit = async () => {
@@ -68,7 +71,10 @@ export default function ProfileScreen({ navigation }) {
         <View style={{backgroundColor:'white'}}>
             
             <ScrollView>
-             
+
+            {/* Cerrar la sesion */}
+            <SignOutButton></SignOutButton>
+
             {/* mostrar el nombre */}
             <Text style={{margin: 20}}>Nombre de usuario:  <Text style={{fontWeight: 'bold'}}>{userDB.displayName}</Text></Text>
            
@@ -91,11 +97,11 @@ export default function ProfileScreen({ navigation }) {
             <TouchableOpacity onPress={handleSubmit} style={[!loadingSubmit ? (styles.button):(styles.buttonDisabled), {width: '100%'}]} disabled={loadingSubmit}>
                 <Text style={{color: 'white', fontWeight: 'bold'}}>{!loadingSubmit ? ('Guardar cambios del perfil'):('Enviando...') }</Text>
             </TouchableOpacity>
+            
+            
 
 
-
-
-
+       
             
             </ScrollView>
             
