@@ -10,7 +10,7 @@ export function initUserDB(user){
         isAdmin: false,
         isProfesor: false,
         isAnonymous: user.isAnonymous,
-        avatar: null,
+        avatar: "avatars/albereinstain_1.png",
         disabled: false,
         stats: {
           logros: [],

@@ -62,10 +62,6 @@ export default function ProfileScreen({ navigation }) {
             console.error('ProfileScreen: Error actualizando el usuario: ', error);
             setLoadingSubmit(false);
         }
-        setVariable({
-            displayName: userDB.displayName,
-            bio: userDB.bio,
-        });
         setLoadingSubmit(false);
     };
     if (loadingScreen) {
