@@ -28,11 +28,11 @@ export default function StatsScreen({ navigation }) {
   // por cierto al actualizar se coloca como que users es null
   const handleRefreshUsers = async (data) => {
     await setUsers(data);
-    setLoadingUserData(false);
   };
-
+  
   const handleRefreshUserDBStats = async (data) => {
     await setUserDB(data);
+    setLoadingUserData(false);
   };
   useEffect(() => {
     const upUserDB = async () => {
@@ -304,9 +304,12 @@ export default function StatsScreen({ navigation }) {
   };
 
   if (loadingUserData) {
-    return <LoadingScreen />;
-  }
-
+    return (
+    <View style={styles.container}>
+        <LoadingScreen/>
+    </View>
+)
+}
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={{paddingBottom: 150}}
