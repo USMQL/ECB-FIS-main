@@ -2,10 +2,9 @@ import { auth } from '../firebase-config'
 import { StyleSheet, Text, View, TextInput, Button, Alert, TouchableOpacity,ScrollView } from 'react-native';
 import { subscribeUserDB, refreshUserDB, updateUserDB } from '../utils/initUser';
 import { useEffect, useState } from 'react';
-import { actualizarDocumento , agregarDocumento, obtenerDocumento } from '../utils/firebaseUtils';
 import LoadingScreen from './LoadingScreen';
-import SignOutButton from'../components/SignOutButton';
-
+import ProfileImage from '../components/ProfileImage';
+import { StatusBar } from 'expo-status-bar';
 
 
 export default function ProfileScreen({ navigation }) {
@@ -15,25 +14,21 @@ export default function ProfileScreen({ navigation }) {
     const [userDB, setUserDB] = useState(null);
     
     const [variable, setVariable] = useState({
-        parametro: variable,
+        displayName: userDB?.displayName || "",
+        bio: userDB?.bio || "",
     });
 
-    const handleUpdateUserDB = async () => {
-        await updateUserDB(user);
-        
-      }
     
     // Actualizar el estado del formulario.
     const handleInputChange = (name, value) => {
         setVariable({ ...variable, [name]: value });
     };
-    let unsubscribeUserDB = null;
+    let unsubscribeUserDB = () => (null);
 
     const handleRefreshUserDBPerfil = async (data) => {
         await setUserDB(data);
         setLoadingScreen(false);
-      }
-
+    }
     useEffect(() => {
         const upUserDB = async () => {
             unsubscribeUserDB = await subscribeUserDB(handleRefreshUserDBPerfil);
@@ -49,9 +44,14 @@ export default function ProfileScreen({ navigation }) {
     const handleSubmit = async () => {
         try{
             setLoadingSubmit(true);
+
+            if (variable.displayName === "") {
+                Alert.alert("Ups!", "El nombre de usuario no puede estar vacío.");
+                setLoadingSubmit(false);
+                return;
+            }
             
             const userData = {
-                
                 displayName: variable.displayName,
                 bio: variable.bio,
             };
@@ -59,79 +59,91 @@ export default function ProfileScreen({ navigation }) {
             await refreshUserDB(user);
             
         } catch (error) {
-            console.error('Error añadiendo el ejercicio: ', error);
-            Alert.alert('Ups!', 'Error añadiendo el ejercicio: ', error.message);
+            console.error('ProfileScreen: Error actualizando el usuario: ', error);
+            setLoadingSubmit(false);
         }
+        setVariable({
+            displayName: userDB.displayName,
+            bio: userDB.bio,
+        });
         setLoadingSubmit(false);
     };
-    if (loadingScreen) return <LoadingScreen/>;
+    if (loadingScreen) {
+        return (
+        <View style={styles.background}>
+            <LoadingScreen/>
+        </View>
+        )
+    }
     return (
-
-        
-        <View style={{backgroundColor:'white'}}>
+        <View style={styles.background}>
+            <ScrollView contentContainerStyle={styles.scrollContainer}>
+                <ProfileImage userData={userDB} />
+                {/* mostrar el nombre */}
+                <Text style={{margin: 20}}>Nombre de usuario:  <Text style={{fontWeight: 'bold'}}>@{userDB.displayName}</Text></Text>
             
-            <ScrollView>
-
-            {/* Cerrar la sesion */}
-            <SignOutButton></SignOutButton>
-
-            {/* mostrar el nombre */}
-            <Text style={{margin: 20}}>Nombre de usuario:  <Text style={{fontWeight: 'bold'}}>{userDB.displayName}</Text></Text>
-           
-            {/* */}
-            <Text style={{margin: 20}}>Tu biografia: <Text style={{fontWeight: 'bold'}}>{userDB.bio}</Text></Text>
-             {/* escribir el nombre */}
-            <TextInput
-                style={styles.inputNombre}
-                placeholder="Cambiar nombre de usuario"
-                value={variable.displayName}
-                onChangeText={text => handleInputChange('displayName',text) }
-            />
-            {/* escribir la biografia */}
-            <TextInput
-                style={styles.inputBio}
-                placeholder="Cambiar biografia"
-                value={variable.bio}
-                onChangeText={text => handleInputChange('bio',text) }
-            />
-            <TouchableOpacity onPress={handleSubmit} style={[!loadingSubmit ? (styles.button):(styles.buttonDisabled), {width: '100%'}]} disabled={loadingSubmit}>
-                <Text style={{color: 'white', fontWeight: 'bold'}}>{!loadingSubmit ? ('Guardar cambios del perfil'):('Enviando...') }</Text>
-            </TouchableOpacity>
-            
-            
-
-
-       
-            
+                {/* */}
+                {userDB?.bio&& <Text style={{}}>Tu biografia</Text>}
+                <View style={[styles.inputBio, {borderWidth: 0, alignItems: 'center'}]}>
+                    <Text style={{}}>{userDB.bio}</Text>
+                </View>
+                {/* escribir el nombre */}
+                <TextInput
+                    style={styles.inputNombre}
+                    placeholder="Cambiar nombre de usuario"
+                    value={variable.displayName}
+                    onChangeText={text => handleInputChange('displayName',text) }
+                />
+                {/* escribir la biografia */}
+                <TextInput
+                    style={styles.inputBio}
+                    placeholder="Cambiar biografia"
+                    value={variable.bio}
+                    onChangeText={text => handleInputChange('bio',text) }
+                    multiline={true}
+                />
+                <TouchableOpacity onPress={handleSubmit} style={[styles.button, loadingSubmit&& styles.buttonDisabled]} disabled={loadingSubmit}>
+                    <Text style={{color: 'white', fontWeight: 'bold'}}>{!loadingSubmit ? ('Guardar cambios del perfil'):('Enviando...') }</Text>
+                </TouchableOpacity>     
             </ScrollView>
-            
+            <StatusBar style="auto" />
         </View > 
-        
     );
 }
 
 const styles = StyleSheet.create({
+    background: {
+        flex: 1,
+        backgroundColor: '#fff',
+    },
+    scrollContainer: {
+        alignItems: 'center',
+        height: '100%',
+    },
     button: {
+        width: 300,
         alignItems: 'center',
         justifyContent: 'center',
         paddingVertical: 12,
-        paddingHorizontal: 32,
-        borderRadius: 4,
+        // paddingHorizontal: 32,
+        borderRadius: 10,
         elevation: 3,
         backgroundColor: 'black',
-        
-      },
-      text: {
+    },
+    buttonDisabled: {
+        backgroundColor: 'gray',
+    },
+    text: {
         fontSize: 16,
         lineHeight: 21,
         fontWeight: 'bold',
         letterSpacing: 0.25,
         color: 'white',
         backgroundColor: 'white'
-      },
-      inputBio: {
+    },
+    inputBio: {
         height: 80,
-        width: '100%',
+        width: 300,
         padding: 10,
         marginTop: 5,
         marginBottom: 20,
@@ -144,7 +156,7 @@ const styles = StyleSheet.create({
     },
     inputNombre: {
         height: 40,
-        width: '100%',
+        width: 300,
         padding: 10,
         marginTop: 5,
         marginBottom: 20,
@@ -155,8 +167,4 @@ const styles = StyleSheet.create({
         textAlign: 'left',
         backgroundColor: 'white'
     },
-
-
-
-
 });

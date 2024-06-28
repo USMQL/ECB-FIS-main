@@ -90,6 +90,7 @@ export default function App() {
         }}/>
         <Tab.Screen name="Perfil" component={ProfileScreen} options={{
           title: 'Perfil',
+          headerLeft: (props) => (<SignOutButton/>),
           tabBarIcon: ({focused, color, size}) => (
             <MaterialCommunityIcons name="account" color={color} size={30}/>
           ),

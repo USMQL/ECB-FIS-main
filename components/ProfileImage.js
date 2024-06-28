@@ -4,7 +4,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import { descargarArchivo } from '../utils/firebaseUtils';
 
-export default function ProfileHomeButton({ navigation, userData }) {
+export default function ProfileImage({ userData }) {
     const [avatar, setAvatar] = useState(userData?.avatar);
     const [imageAvatar, setImageAvatar] = useState(null);
     async function getImageAvatar() {
@@ -16,12 +16,11 @@ export default function ProfileHomeButton({ navigation, userData }) {
     return (
         <TouchableOpacity style={styles.button} onPress={() => {
             Vibration.vibrate(10);
-            navigation?.navigate("Perfil");
-        }}>
+            }}>
             {!imageAvatar? (
-                <MaterialCommunityIcons name="account" size={30} color="white" />
+                <MaterialCommunityIcons name="account" size={100} color="white" />
             ) : (
-                <Image source={imageAvatar} style={{width: 45, height: 45, borderRadius: 100}} contentFit='cover' />
+                <Image source={imageAvatar} style={{width: 150, height: 150, borderRadius: 100}} contentFit='cover' />
             )}
         </TouchableOpacity>
     );
@@ -31,10 +30,9 @@ const styles = StyleSheet.create({
     button: {
         alignItems: 'center',
         justifyContent: 'center',
-        width: 45,
-        height: 45,
-        backgroundColor: '#fff4',
+        width: 150,
+        height: 150,
+        backgroundColor: '#0004',
         borderRadius: 100,
-        marginRight: 20,
     },
 });
