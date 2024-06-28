@@ -12,6 +12,7 @@ import LoadingScreen from './screens/LoadingScreen';
 import LoginScreen from './screens/LoginScreen';
 import HomeScreen from './screens/HomeScreen';
 import UploadScreen from './screens/UploadScreen';
+import StatsScreen from './screens/StatsScreen';
 import ExerciseScreen from './screens/ExerciseScreen';
 
 // Componentes.
@@ -85,6 +86,24 @@ export default function App() {
           tabBarIcon: ({focused, color, size}) => (
             <MaterialCommunityIcons name="home" color={color} size={30}/>
           ),
+        }}/>
+        <Tab.Screen name="Stats" component={StatsScreen} options={{
+          title: 'Estadisticas',
+          tabBarIcon: ({focused, color, size}) => (
+            <MaterialCommunityIcons name="chart-bar" color={color} size={30}/>
+          ),
+          // headerTransparent: true,
+          headerStyle: {
+            backgroundColor: '#fff',
+            elevation: 0,
+            shadowOpacity: 0,
+            borderBottomWidth: 0,
+          },
+          headerTitleAlign: 'center',
+          headerTintColor: '#000',
+          headerTitleStyle: {
+            fontWeight: 'bold',
+          },
         }}/>
         {userdb?.isProfesor ? (
         <Tab.Screen name="Upload" component={UploadScreen} options={{
