@@ -9,6 +9,7 @@ import LoadingScreen from './LoadingScreen';
 import DailyExercise from '../components/DailyExercise';
 import HeaderStyle from '../components/HeaderStyle';
 import { obtenerDocumento } from '../utils/firebaseUtils';
+import ProfileHomeButton from '../components/ProfileHomeButton';
 
 export default function HomeScreen({ navigation }) {
     const [loadingUserData, setLoadingUserData] = useState(true);
