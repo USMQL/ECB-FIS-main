@@ -1,6 +1,6 @@
 import { db, storage } from '../firebase-config';
 import { addDoc, collection, doc, setDoc, updateDoc, getDoc, getDocs } from 'firebase/firestore';
-import { ref, uploadBytes } from 'firebase/storage';
+import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 
 export async function subirArchivo(archivo, carpeta) {
     if (!archivo) return null;
@@ -18,6 +18,15 @@ export async function subirArchivo(archivo, carpeta) {
         console.error('Error al subir el archivo', error);
     });
     return ruta;
+}
+
+export async function descargarArchivo(ruta) {
+    if (!ruta) return null;
+
+    const fileRef = ref(storage, ruta);
+    return await getDownloadURL(fileRef).catch((error) => {
+        console.error('Error al descargar el archivo', error);
+    });
 }
 
 export async function agregarDocumento(table, data, id) {
@@ -54,21 +63,3 @@ export async function obtenerColeccion(table) {
         throw error;
     });
 }
-
-/* 
-Al usar obtenerColeccion(table), si quieres obtner a todos los usuarios hay que usar obtenerColeccion("users")
-Al usarlo se obtiene un objeto que es bien raro la verdad xd pero puedes usar este formato
-const variable = await obtenerColeccion("users");
-const users = variable.docs;
-users.forEach((usuario) => {
-    console.log("Id:", usuario.id, "Datos:", usuario.data());
-});
-
-eso xd
-grax
-
-En mi rama de `generarEjercicio` estoy usando esa funcion por si quieres algo de referencia
-Creo que en la funcion seleccionarEjercicioAleatorio() en utils
-Te pasa que estas escribiendo y te dan ganas de guardar? la costumbre
-si xd
-*/

@@ -123,11 +123,11 @@ export default function StatsScreen({ navigation }) {
         />
         <View>
           <Table
-            borderStyle={{ borderWidth: 1, borderColor: "#63cbfa" }}
+            // borderStyle={{ borderWidth: 1, borderColor: "#63cbfa" }}
             style={{
               marginVertical: 10,
               borderRadius: 16,
-              borderWidth: 1,
+              // borderWidth: 1,
               borderColor: "#00acfb",
               backgroundColor: "#63cbfa",
               padding: 10,
