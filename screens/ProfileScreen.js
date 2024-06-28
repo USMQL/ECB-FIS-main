@@ -12,6 +12,7 @@ export default function ProfileScreen({ navigation }) {
     const [loadingSubmit, setLoadingSubmit] = useState(false);
     const user = auth.currentUser;
     const [userDB, setUserDB] = useState(null);
+    let unsubscribeUserDB = () => (null);
     
     const [variable, setVariable] = useState({
         displayName: userDB?.displayName || "",
@@ -23,7 +24,6 @@ export default function ProfileScreen({ navigation }) {
     const handleInputChange = (name, value) => {
         setVariable({ ...variable, [name]: value });
     };
-    let unsubscribeUserDB = () => (null);
 
     const handleRefreshUserDBPerfil = async (data) => {
         await setUserDB(data);
@@ -45,17 +45,16 @@ export default function ProfileScreen({ navigation }) {
         try{
             setLoadingSubmit(true);
 
-            if (variable.displayName === "") {
+            if (!variable.displayName) {
                 Alert.alert("Ups!", "El nombre de usuario no puede estar vacío.");
                 setLoadingSubmit(false);
                 return;
             }
             
-            const userData = {
+            await updateUserDB(user, {
                 displayName: variable.displayName,
-                bio: variable.bio,
-            };
-            await updateUserDB(user, userData)  
+                bio: variable.bio? variable.bio : userDB.bio,
+            })  
             await refreshUserDB(user);
             
         } catch (error) {
@@ -78,12 +77,14 @@ export default function ProfileScreen({ navigation }) {
                 {/* mostrar el nombre */}
                 <Text style={{margin: 20}}>Nombre de usuario:  <Text style={{fontWeight: 'bold'}}>@{userDB.displayName}</Text></Text>
             
-                {/* */}
                 {userDB?.bio&& <Text style={{}}>Tu biografia</Text>}
+                {userDB?.bio&& (
                 <View style={[styles.inputBio, {borderWidth: 0, alignItems: 'center'}]}>
                     <Text style={{}}>{userDB.bio}</Text>
                 </View>
+                )}
                 {/* escribir el nombre */}
+                <Text style={{}}>Cambiar nombre de usuario</Text>
                 <TextInput
                     style={styles.inputNombre}
                     placeholder="Cambiar nombre de usuario"
@@ -91,6 +92,7 @@ export default function ProfileScreen({ navigation }) {
                     onChangeText={text => handleInputChange('displayName',text) }
                 />
                 {/* escribir la biografia */}
+                <Text style={{}}>Cambiar biografia</Text>
                 <TextInput
                     style={styles.inputBio}
                     placeholder="Cambiar biografia"

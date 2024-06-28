@@ -22,6 +22,7 @@ import RecPasswordScreen from './screens/RecPasswordScreen';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Saludo from './components/Saludo';
 import ProfileHomeButton from './components/ProfileHomeButton';
+import { LinearGradient } from 'expo-linear-gradient';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -137,12 +138,14 @@ export default function App() {
 
 const tabNavigatorScreenOptions = {
   // --- TabBar ---
+  tabBarBackground: () => (<LinearGradient colors={['#fffc', '#fff']} style={{flex: 1}} end={{x: 0.5, y: 0.8}}/>),
   tabBarStyle: {
-    // position: 'absolute',
+    position: 'absolute',
     height: 80,
     paddingBottom: 10,
     paddingTop: 10,
     elevation: 0,
+    borderTopWidth: 0,
   },
   tabBarLabelStyle: {
     fontSize: 14,

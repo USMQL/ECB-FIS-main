@@ -8,30 +8,32 @@ import { agregarDocumento, subirArchivo } from '../utils/firebaseUtils';
 import { seleccionarImagen } from '../utils/seleccionarImagen';
 import { Picker } from '@react-native-picker/picker';
 
+const initialValues = {
+    titulo: '', // Título del ejercicio.
+    descripcion: '', // De que trata el ejercicio.
+    materia: '', // Materia a la que pertenece el ejercicio.
+    contenido: '', // Enunciado del ejercicio.
+    imagenURL: null, // URL de la imagen del ejercicio.
+    formulaURL: null, // URL de la formula del ejercicio.
+    respuestas: '', // Posibles respuestas del ejercicio.
+    respuesta: '', // Respuesta del ejercicio.
+    dificultad: 'Medio', // Dificultad del ejercicio.
+    puntaje: 0, // Puntaje del ejercicio.
+    tipoEjercicio: 'Normal', // Ejercicio "Diario" o "Normal".
+    tiempo: 0, // Tiempo en segundos para resolver el ejercicio.
+    retroalimentacion: '', // Retroalimentación del ejercicio.
+    foro: null,
+    reportado: null,
+    publicadoPor: '', // UID del usuario que publicó el ejercicio.
+    disabled: false,
+};
+
 export default function UploadScreen() {
     const [loading, setLoading] = useState(false);
     const [ejercicioImg, setEjercicioImg] = useState(null);
     const [formulaImg, setFormulaImg] = useState(null);
 
-    const [formData, setFormData] = useState({
-        titulo: '', // Título del ejercicio.
-        descripcion: '', // De que trata el ejercicio.
-        materia: '', // Materia a la que pertenece el ejercicio.
-        contenido: '', // Enunciado del ejercicio.
-        imagenURL: null, // URL de la imagen del ejercicio.
-        formulaURL: null, // URL de la formula del ejercicio.
-        respuestas: '', // Posibles respuestas del ejercicio.
-        respuesta: '', // Respuesta del ejercicio.
-        dificultad: 'Medio', // Dificultad del ejercicio.
-        puntaje: 0, // Puntaje del ejercicio.
-        tipoEjercicio: 'Normal', // Ejercicio "Diario" o "Normal".
-        tiempo: 0, // Tiempo en segundos para resolver el ejercicio.
-        retroalimentacion: '', // Retroalimentación del ejercicio.
-        foro: null,
-        reportado: null,
-        publicadoPor: '', // UID del usuario que publicó el ejercicio.
-        disabled: false,
-    });
+    const [formData, setFormData] = useState(initialValues);
 
     // Seleccionar una imagen de la galería.
     const handleSeleccionarImagenEjercicio = async () => {
@@ -49,6 +51,18 @@ export default function UploadScreen() {
     // Actualizar el estado del formulario.
     const handleInputChange = (name, value) => {
         setFormData({ ...formData, [name]: value });
+    };
+    // Limpiar el formulario.
+    const clearForm = () => {
+        setFormData(initialValues);
+        setEjercicioImg(null);
+        setFormulaImg(null);
+    };
+    const handleClearForm = () => {
+        Alert.alert("Limpiar formulario", "¿Está segur@ que desea limpiar el formulario?", [
+            { text: "Cancelar", style: "cancel", onPress: () => null },
+            { text: "Confirmar", onPress: () => (clearForm()) },
+        ]);
     };
     // Enviar el formulario a la base de datos.
     const handleSubmit = () => {
@@ -166,8 +180,8 @@ export default function UploadScreen() {
             {!(formData.respuestas === "") && (
                 <View style={[styles.respuestasContainer]}>
                     {formData.respuestas.split(',').map(r => r.trim()).map((respuesta, index) => (
-                        <TouchableOpacity style={[styles.respuestaItem]} key={index}>
-                            <Text style={[styles.respuestaItemText]}>{respuesta}</Text>
+                        <TouchableOpacity style={[styles.respuestaItem, (respuesta === formData.respuesta)&& styles.selectedRespuestaItem]} key={index}>
+                            <Text style={[styles.respuestaItemText, (respuesta === formData.respuesta)&& styles.selectedRespuestaItemText]}>{respuesta}</Text>
                         </TouchableOpacity>
                     ))}
                 </View>
@@ -226,6 +240,9 @@ export default function UploadScreen() {
             <TouchableOpacity onPress={handleSubmit} style={[[styles.button, loading && styles.buttonDisabled, {width: '100%'}]]} disabled={loading}>
                 <Text style={{color: 'white', fontWeight: 'bold'}}>{!loading ? ('Enviar a la base de datos'):('Enviando...') }</Text>
             </TouchableOpacity>
+            <TouchableOpacity onPress={handleClearForm} style={[styles.button, {backgroundColor: 'red', width: '100%'}]}>
+                <Text style={{color: 'white', fontWeight: 'bold'}}>Limpiar formulario</Text>
+            </TouchableOpacity>
             
         </ScrollView>
         <StatusBar style="auto" />
@@ -237,7 +254,7 @@ const styles = StyleSheet.create({
     container: {
         backgroundColor: '#fff',
         paddingHorizontal: 20,
-        paddingBottom: 60,
+        paddingBottom: 150,
     },
     row: {
         flexDirection: 'row',
@@ -311,5 +328,10 @@ const styles = StyleSheet.create({
     respuestaItemText: {
         color: '#000',
     },
-
+    selectedRespuestaItem: {
+        backgroundColor: '#326b75',
+    },
+    selectedRespuestaItemText: {
+        color: '#ddf0ee',
+    },
 });

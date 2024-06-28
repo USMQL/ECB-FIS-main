@@ -309,7 +309,7 @@ export default function StatsScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <ScrollView
+      <ScrollView contentContainerStyle={{paddingBottom: 150}}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
