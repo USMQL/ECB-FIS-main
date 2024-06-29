@@ -118,6 +118,7 @@ export default function StatsScreen({ navigation }) {
             color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
             labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
             style: { borderRadius: 16 },
+            propsForVerticalLabels: { fontWeight: "bold" },
           }}
           style={{ marginVertical: 10, borderRadius: 16 }}
         />
@@ -267,17 +268,16 @@ export default function StatsScreen({ navigation }) {
     if (!userDB) {
       return null;
     }
-    const creados = userDB.stats.ejerciciosCreados.length;
     const enCurso = userDB.stats.ejerciciosEnCurso.length;
     const intentados = userDB.stats.ejerciciosIntentados.length;
     const terminados = userDB.stats.ejerciciosTerminados.length;
     return (
       <BarChart
         data={{
-          labels: ["Creados", "En Curso", "Intentados", "Terminados"],
+          labels: ["En Curso", "Intentados", "Terminados"],
           datasets: [
             {
-              data: [creados, enCurso, intentados, terminados],
+              data: [enCurso, intentados, terminados],
             },
           ],
         }}

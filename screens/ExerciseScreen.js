@@ -1,5 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, BackHandler, Text, View, Modal, TouchableOpacity, ScrollView, TextInput, Alert } from 'react-native';
+import { StyleSheet, BackHandler, Text, View, Modal, TouchableOpacity, ScrollView, TextInput, Alert, KeyboardAvoidingView } from 'react-native';
 import { Image } from 'expo-image';
 import { useEffect, useState } from 'react';
 import { arrayUnion } from 'firebase/firestore';
@@ -164,7 +164,7 @@ export default function ExerciseScreen({ navigation, route }) {
         );
     }
     return (
-        <View style={styles.background}>
+        <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.background}>
             <ScrollView contentContainerStyle={styles.container}>
             <Text style={styles.description}>{ejercicioData.contenido}</Text>
 
@@ -211,7 +211,7 @@ export default function ExerciseScreen({ navigation, route }) {
             {imagenFormula && <FormulaModal/>}
             <ResultadoModal/>
             <StatusBar style="auto" />
-        </View>
+        </KeyboardAvoidingView>
     );
 }
 

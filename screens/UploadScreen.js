@@ -1,5 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import { View, StyleSheet, TouchableOpacity, TextInput, ScrollView, Text, Alert } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, TextInput, ScrollView, Text, Alert, KeyboardAvoidingView } from 'react-native';
 import { Image } from 'expo-image';
 import { useState } from 'react';
 
@@ -112,8 +112,8 @@ export default function UploadScreen() {
     };
 
     return (
-        <View style={{flex: 1, backgroundColor: '#fff'}}>
-        <ScrollView contentContainerStyle={styles.container}>
+        <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{flex: 1, backgroundColor: '#fff'}}>
+        <ScrollView contentContainerStyle={styles.container} pinchGestureEnabled={false}>
             <Text style={styles.label}>Título (opcional)</Text>
             <TextInput
                 style={styles.input}
@@ -246,7 +246,7 @@ export default function UploadScreen() {
             
         </ScrollView>
         <StatusBar style="auto" />
-        </View>
+        </KeyboardAvoidingView>
     );
 }
 

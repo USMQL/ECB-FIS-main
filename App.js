@@ -80,33 +80,21 @@ export default function App() {
       ) : (
         // El usuario se encuentra logeado.
       <Tab.Navigator initialRouteName={'Home'} screenOptions={tabNavigatorScreenOptions}>
-        <Tab.Screen name="Home" component={HomeScreen} options={{
+        <Tab.Screen name="Home" component={HomeScreen} options={({navigation}) => ({
           title: 'Inicio',
           headerTitle: (props) => (<Saludo/>),
-          headerRight: (props) => (<ProfileHomeButton userData={userdb}/>),
+          headerRight: (props) => (<ProfileHomeButton navigation={navigation} userData={userdb}/>),
           headerTitleAlign: 'left',
           headerTransparent: true,
           tabBarIcon: ({focused, color, size}) => (
             <MaterialCommunityIcons name="home" color={color} size={30}/>
           ),
-        }}/>
+        })}/>
         <Tab.Screen name="Stats" component={StatsScreen} options={{
           title: 'Estadisticas',
           tabBarIcon: ({focused, color, size}) => (
             <MaterialCommunityIcons name="chart-bar" color={color} size={30}/>
           ),
-          // headerTransparent: true,
-          headerStyle: {
-            backgroundColor: '#fff',
-            elevation: 0,
-            shadowOpacity: 0,
-            borderBottomWidth: 0,
-          },
-          headerTitleAlign: 'center',
-          headerTintColor: '#000',
-          headerTitleStyle: {
-            fontWeight: 'bold',
-          },
         }}/>
         <Tab.Screen name="Perfil" component={ProfileScreen} options={{
           title: 'Perfil',
@@ -128,7 +116,6 @@ export default function App() {
           tabBarStyle: {display: 'none'},
           tabBarItemStyle: {display: 'none'},
           unmountOnBlur: true,
-          
         }}/>
       </Tab.Navigator>
       )}

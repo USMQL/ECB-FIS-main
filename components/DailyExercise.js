@@ -4,7 +4,7 @@ import Constants from 'expo-constants';
 import { useState } from 'react';
 import { obtenerDocumento } from '../utils/firebaseUtils';
 
-export default function DailyExercise({ navigation, ejercicioDiario, functionOnButtonDisabled }) {
+export default function DailyExercise({ navigation, ejercicioDiario, functionOnButtonDisabled, isButtonDisabled }) {
     const [exerciseButtonDisabled, setExerciseButtonDisabled] = useState(false);
     
     const handleGoEjercicioDiario = async () => {
@@ -27,7 +27,7 @@ export default function DailyExercise({ navigation, ejercicioDiario, functionOnB
         <LinearGradient style={styles.background} colors={['#8752a8', '#4c9bb3']} end={{x: 1.5, y: 1.5}}>
             <View style={styles.container}>
                 <Text style={styles.text}>¡Prueba suerte con el ejercicio diario!</Text>
-                <TouchableOpacity style={[styles.button]} onPress={handleGoEjercicioDiario} disabled={exerciseButtonDisabled}>
+                <TouchableOpacity style={[styles.button]} onPress={handleGoEjercicioDiario} disabled={exerciseButtonDisabled || isButtonDisabled}>
                     <Text style={styles.buttonText}>Ejercicio Diario</Text>
                 </TouchableOpacity>
             </View>

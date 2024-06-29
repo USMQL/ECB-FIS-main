@@ -9,7 +9,6 @@ import LoadingScreen from './LoadingScreen';
 import DailyExercise from '../components/DailyExercise';
 import HeaderStyle from '../components/HeaderStyle';
 import { obtenerDocumento } from '../utils/firebaseUtils';
-import ProfileHomeButton from '../components/ProfileHomeButton';
 
 export default function HomeScreen({ navigation }) {
     const [loadingUserData, setLoadingUserData] = useState(true);
@@ -79,19 +78,24 @@ export default function HomeScreen({ navigation }) {
     }
     return (
         <View style={styles.background}>
-            {userDB.stats.ejerciciosTerminadosIds.includes(ejercicioDiario)? (
+            {userDB?.stats.ejerciciosTerminadosIds.includes(ejercicioDiario)? (
                 <HeaderStyle/>
             ):(
                 <View style={{width: '100%', zIndex: 10}}>
-                    <DailyExercise navigation={navigation} ejercicioDiario={ejercicioDiario} functionOnButtonDisabled={setExerciseButtonDisabled} />
+                    <DailyExercise 
+                    navigation={navigation}
+                    ejercicioDiario={ejercicioDiario}
+                    functionOnButtonDisabled={setExerciseButtonDisabled}
+                    isButtonDisabled={generarEjercicioButtonDisabled}
+                    />
                 </View>
             )}
             <ScrollView contentContainerStyle={styles.scrollContainer} refreshControl={
                 <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-            }>
+            } pinchGestureEnabled={false}>
                 <View style={styles.container}>
                     <Text style={styles.title}>ECB-FIS</Text>
-                    <Text style={{margin: 20}}>Bienvenido <Text style={{fontWeight: 'bold'}}>{userDB.displayName}</Text>!</Text>
+                    <Text style={{margin: 20}}>Bienvenido <Text style={{fontWeight: 'bold'}}>{userDB?.displayName}</Text>!</Text>
                     
                     <TouchableOpacity style={[styles.button, generarEjercicioButtonDisabled && styles.buttonDisabled, {marginTop: 60}]} onPress={handleGenerarEjercicio} disabled={generarEjercicioButtonDisabled || exerciseButtonDisabled}>
                         <Text style={{color: 'white', fontWeight: 'bold'}}>{!generarEjercicioButtonDisabled? "Generar Ejercicio":"Generando..."}</Text>

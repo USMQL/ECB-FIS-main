@@ -5,14 +5,13 @@ import { Image } from 'expo-image';
 import { descargarArchivo } from '../utils/firebaseUtils';
 
 export default function ProfileImage({ userData }) {
-    const [avatar, setAvatar] = useState(userData?.avatar);
     const [imageAvatar, setImageAvatar] = useState(null);
     async function getImageAvatar() {
-        avatar && setImageAvatar(await descargarArchivo(avatar));
+        userData?.avatar && setImageAvatar(await descargarArchivo(userData?.avatar));
     }
     useEffect(() => {
         getImageAvatar();
-    }, [avatar]);
+    }, [userData?.avatar]);
     return (
         <TouchableOpacity style={styles.button} onPress={() => {
             Vibration.vibrate(10);
@@ -20,7 +19,7 @@ export default function ProfileImage({ userData }) {
             {!imageAvatar? (
                 <MaterialCommunityIcons name="account" size={100} color="white" />
             ) : (
-                <Image source={imageAvatar} style={{width: 150, height: 150, borderRadius: 100}} contentFit='cover' />
+                <Image source={imageAvatar} style={{width: 140, height: 140, borderRadius: 100}} contentFit='cover' />
             )}
         </TouchableOpacity>
     );
@@ -30,8 +29,8 @@ const styles = StyleSheet.create({
     button: {
         alignItems: 'center',
         justifyContent: 'center',
-        width: 150,
-        height: 150,
+        width: 140,
+        height: 140,
         backgroundColor: '#0004',
         borderRadius: 100,
     },

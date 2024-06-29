@@ -1,5 +1,5 @@
 import { auth } from '../firebase-config'
-import { StyleSheet, Text, View, TextInput, Button, Alert, TouchableOpacity,ScrollView } from 'react-native';
+import { StyleSheet, Text, View, TextInput, Button, Alert, TouchableOpacity,ScrollView, KeyboardAvoidingView } from 'react-native';
 import { subscribeUserDB, refreshUserDB, updateUserDB } from '../utils/initUser';
 import { useEffect, useState } from 'react';
 import LoadingScreen from './LoadingScreen';
@@ -53,7 +53,7 @@ export default function ProfileScreen({ navigation }) {
             
             await updateUserDB(user, {
                 displayName: variable.displayName,
-                bio: variable.bio? variable.bio : userDB.bio,
+                bio: variable.bio,
             })  
             await refreshUserDB(user);
             
@@ -71,16 +71,20 @@ export default function ProfileScreen({ navigation }) {
         )
     }
     return (
-        <View style={styles.background}>
-            <ScrollView contentContainerStyle={styles.scrollContainer}>
+        <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.background}>
+            <ScrollView contentContainerStyle={styles.scrollContainer} pinchGestureEnabled={false}>
                 <ProfileImage userData={userDB} />
                 {/* mostrar el nombre */}
-                <Text style={{margin: 20}}>Nombre de usuario:  <Text style={{fontWeight: 'bold'}}>@{userDB.displayName}</Text></Text>
+                <Text style={[styles.textDisplayName, {marginVertical: 20}]}>{userDB?.displayName}</Text>
+
+                <View style={[styles.roleDefault, userDB?.isProfesor&& styles.roleProfesor, {marginBottom: 20}]}>
+                    <Text style={[styles.roleLabel, userDB?.isProfesor&& styles.roleLabelProfesor]}>{!userDB?.isProfesor? "Estudiante":"Profesor"}</Text>
+                </View>
             
-                {userDB?.bio&& <Text style={{}}>Tu biografia</Text>}
+                {userDB?.bio&& <Text style={{fontWeight: "bold"}}>Biografia</Text>}
                 {userDB?.bio&& (
-                <View style={[styles.inputBio, {borderWidth: 0, alignItems: 'center'}]}>
-                    <Text style={{}}>{userDB.bio}</Text>
+                <View style={[styles.inputBio, {borderWidth: 0, alignItems: 'center', padding: 0}]}>
+                    <Text style={{color: "#666", textAlign: "center"}}>{userDB.bio}</Text>
                 </View>
                 )}
                 {/* escribir el nombre */}
@@ -90,6 +94,7 @@ export default function ProfileScreen({ navigation }) {
                     placeholder="Cambiar nombre de usuario"
                     value={variable.displayName}
                     onChangeText={text => handleInputChange('displayName',text) }
+                    maxLength={30}
                 />
                 {/* escribir la biografia */}
                 <Text style={{}}>Cambiar biografia</Text>
@@ -99,13 +104,14 @@ export default function ProfileScreen({ navigation }) {
                     value={variable.bio}
                     onChangeText={text => handleInputChange('bio',text) }
                     multiline={true}
+                    maxLength={100}
                 />
                 <TouchableOpacity onPress={handleSubmit} style={[styles.button, loadingSubmit&& styles.buttonDisabled]} disabled={loadingSubmit}>
-                    <Text style={{color: 'white', fontWeight: 'bold'}}>{!loadingSubmit ? ('Guardar cambios del perfil'):('Enviando...') }</Text>
+                    <Text style={{color: 'white', fontWeight: 'bold'}}>{!loadingSubmit ? ('Guardar cambios del perfil'):('Guardando...') }</Text>
                 </TouchableOpacity>     
             </ScrollView>
             <StatusBar style="auto" />
-        </View > 
+        </KeyboardAvoidingView > 
     );
 }
 
@@ -116,7 +122,35 @@ const styles = StyleSheet.create({
     },
     scrollContainer: {
         alignItems: 'center',
-        height: '100%',
+        paddingBottom: 150,
+    },
+    textDisplayName: {
+        fontSize: 22,
+        fontWeight: 'bold',
+        textAlign: 'center',
+    },
+    roleDefault: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingVertical: 10,
+        paddingHorizontal: 20,
+        borderWidth: 1,
+        borderRadius: 20,
+        borderColor: '#4c9bb3',
+        backgroundColor: '#4c9bb344',
+    },
+    roleLabel: {
+        fontSize: 14,
+        fontWeight: 'bold',
+        textAlign: 'center',
+        color: '#4c9bb3',
+    },
+    roleProfesor: {
+        backgroundColor: '#8752a844',
+        borderColor: '#8752a8',
+    },
+    roleLabelProfesor: {
+        color: '#8752a8',
     },
     button: {
         width: 300,

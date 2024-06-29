@@ -5,14 +5,13 @@ import { Image } from 'expo-image';
 import { descargarArchivo } from '../utils/firebaseUtils';
 
 export default function ProfileHomeButton({ navigation, userData }) {
-    const [avatar, setAvatar] = useState(userData?.avatar);
     const [imageAvatar, setImageAvatar] = useState(null);
     async function getImageAvatar() {
-        avatar && setImageAvatar(await descargarArchivo(avatar));
+        userData?.avatar && setImageAvatar(await descargarArchivo(userData?.avatar));
     }
     useEffect(() => {
         getImageAvatar();
-    }, [avatar]);
+    }, [userData?.avatar]);
     return (
         <TouchableOpacity style={styles.button} onPress={() => {
             Vibration.vibrate(10);

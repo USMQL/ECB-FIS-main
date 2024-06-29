@@ -2,7 +2,7 @@
   "expo": {
     "name": "ECB-FIS",
     "slug": "ECB-FIS",
-    "version": "0.2.0",
+    "version": "0.2.1",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -28,6 +28,14 @@
         "projectId": "156984eb-dec3-4940-ab72-05fddc8189ef"
       }
     },
-    "owner": "usmql"
+    "owner": "usmql",
+    "plugins": [
+      [
+        "expo-asset",
+        {
+          "assets": ["./assets"]
+        }
+      ]
+    ]
   }
 }
