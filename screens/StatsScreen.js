@@ -1,7 +1,6 @@
 import { StatusBar } from "expo-status-bar";
 import {
   StyleSheet,
-  BackHandler,
   Text,
   View,
   RefreshControl,
@@ -11,7 +10,6 @@ import {
 import { useCallback, useEffect, useState } from "react";
 import { auth } from "../firebase-config";
 import { subscribeUserDB, refreshUserDB } from "../utils/initUser";
-import { exitApp } from "../utils/backAction";
 import { BarChart } from "react-native-chart-kit";
 import { Table, TableWrapper } from "react-native-table-component";
 
@@ -32,27 +30,18 @@ export default function StatsScreen({ navigation }) {
   
   const handleRefreshUserDBStats = async (data) => {
     await setUserDB(data);
+    await handleRefreshUsers(await GlobalStats());
     setLoadingUserData(false);
   };
   useEffect(() => {
     const upUserDB = async () => {
       unsubscribeUserDB = await subscribeUserDB(handleRefreshUserDBStats);
-      await handleRefreshUsers(GlobalStats());
       await refreshUserDB(user);
     };
 
     upUserDB();
     return () => unsubscribeUserDB();
   }, [user]);
-
-  // Salir de la aplicación.
-  useEffect(() => {
-    const backHandler = BackHandler.addEventListener(
-      "hardwareBackPress",
-      exitApp
-    );
-    return () => backHandler.remove();
-  }, []);
 
   // Actualizar datos del usuario.
   const onRefresh = useCallback(() => {
@@ -64,7 +53,7 @@ export default function StatsScreen({ navigation }) {
 
   const TopPuntajes = () => {
     // tabla de los top 5 puntajes
-    const topPuntajes = users._j;
+    let topPuntajes = users;
 
     if (!topPuntajes) {
       return null;
@@ -317,9 +306,9 @@ export default function StatsScreen({ navigation }) {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       >
-        <View style={{ alignItems: "center", padding: 10 }}>
-          <Text style={{ fontSize: 20, fontWeight: "bold" }}>Top Mundial</Text>
-          <TopPuntajes />
+        <View style={{ alignItems: "center", paddingHorizontal: 10 }}>
+          {users&& <Text style={{ fontSize: 20, fontWeight: "bold" }}>Top Mundial</Text>}
+          {users&& <TopPuntajes />}
           <Text style={{ fontSize: 20, fontWeight: "bold" }}>
             Estadisticas Personales
           </Text>

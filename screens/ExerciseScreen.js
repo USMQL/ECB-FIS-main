@@ -1,5 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, BackHandler, Text, View, Modal, TouchableOpacity, ScrollView, TextInput, Alert, KeyboardAvoidingView } from 'react-native';
+import { StyleSheet, BackHandler, Text, View, Modal, TouchableOpacity, ScrollView, TextInput, Alert, KeyboardAvoidingView, Platform } from 'react-native';
 import { Image } from 'expo-image';
 import { useEffect, useState } from 'react';
 import { arrayUnion } from 'firebase/firestore';
@@ -84,8 +84,8 @@ export default function ExerciseScreen({ navigation, route }) {
                 puntajeObtenido: puntajeObtenido,
             }),
             "stats.ejerciciosTerminadosIds": arrayUnion(ejercicioId),
-            "stats.puntajeTotal.ejerciciosGenerados": ejercicioData.tipoEjercicio === "Normal"? (userDB.stats.puntajeTotal.ejerciciosGenerados + puntajeObtenido) : 0,
-            "stats.puntajeTotal.ejerciciosDiarios": ejercicioData.tipoEjercicio === "Diario"? (userDB.stats.puntajeTotal.ejerciciosDiarios + puntajeObtenido) : 0,
+            "stats.puntajeTotal.ejerciciosGenerados": ejercicioData.tipoEjercicio === "Normal"? (userDB.stats.puntajeTotal.ejerciciosGenerados + puntajeObtenido) : userDB.stats.puntajeTotal.ejerciciosGenerados,
+            "stats.puntajeTotal.ejerciciosDiarios": ejercicioData.tipoEjercicio === "Diario"? (userDB.stats.puntajeTotal.ejerciciosDiarios + puntajeObtenido) : userDB.stats.puntajeTotal.ejerciciosDiarios,
         });
         setIsRefreshing(false);
         return;
